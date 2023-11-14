@@ -5,7 +5,7 @@ A memorable password generator, a CLI version of xkpasswd.net written in Go
 ## Install
 
 ```
-go install https://github.com/eljamo/mempass@latest
+go install github.com/eljamo/mempass@latest
 ```
 
 ## Run locally after git clone
