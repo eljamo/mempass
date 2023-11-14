@@ -8,24 +8,6 @@ A memorable password generator, a CLI version of xkpasswd.net written in Go
 go install github.com/eljamo/mempass@latest
 ```
 
-## Run locally after git clone
-
-```
-~/c/g/mempass $ go run .
---28-chrome-dream-clocks-28--
-==63@DIVIDE@glossary@tough@36==
-$$53?LOTTERY?HAVE?HOTMAIL?81$$
-```
-
-## Build & Run locally
-
-```
-~/c/g/mempass $ go build -o ./bin/mempass ./main.go && ./bin/mempass
-__43:RATIOS:jobs:baghdad:37__
-;;87=struggle=rich=think=08;;
-..25~ESCORTS~scene~NOTICED~62..
-```
-
 ## CLI Example Usage
 
 ### Help
@@ -129,3 +111,38 @@ thudding-spotted-legends-TEMPERS-99?
 52_mill_BRAS_talks_DONNA_93|||||
 07,costa,DANCE,shine,BLINK,37:::
 ```
+
+## Development
+
+### Run locally after git clone
+
+```
+~/c/g/mempass $ go run .
+--28-chrome-dream-clocks-28--
+==63@DIVIDE@glossary@tough@36==
+$$53?LOTTERY?HAVE?HOTMAIL?81$$
+```
+
+### Build & Run
+
+```
+~/c/g/mempass $ go build -o ./bin/mempass ./main.go && ./bin/mempass
+__43:RATIOS:jobs:baghdad:37__
+;;87=struggle=rich=think=08;;
+..25~ESCORTS~scene~NOTICED~62..
+```
+
+### To-do list
+
+* Update word lists below so they exceed 8000+ words
+  * Doctor Who
+  * Game of Thrones
+  * Harry Potter
+  * Star Trek
+  * Star Wars
+* Make word lists for
+  * Ancient History & Mythology
+  * Bloodborne, Dark Souls, Demon's Souls, Elden Ring and Sekiro
+  * Dungeons & Dragons
+  * Pokémon
+  * Warhammer
