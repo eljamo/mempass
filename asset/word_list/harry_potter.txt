@@ -867,7 +867,6 @@ ball
 ballard
 ballington
 balloon
-balls
 band
 bandage
 bandaged
@@ -1213,7 +1212,6 @@ blond
 blood
 bloodline
 bloodthirsty
-bloody
 blooming
 bloomsbury
 blossom
@@ -2581,7 +2579,6 @@ dale
 damage
 damaged
 damian
-damn
 damocles
 dance
 danced
@@ -3211,7 +3208,6 @@ domesticelf
 dominance
 dominate
 dominating
-domination
 dominion
 dominique
 donaghan
@@ -3776,7 +3772,6 @@ escapee
 escapees
 escapes
 escaping
-escort
 escorted
 escorting
 escorts
@@ -5212,7 +5207,6 @@ helen
 helena
 helga
 heliotrope
-hell
 helmet
 helmut
 help
@@ -5648,7 +5642,6 @@ incarcerous
 incensed
 incentive
 inception
-incest
 inch
 inches
 incidences
@@ -5893,7 +5886,6 @@ intercept
 intercepted
 intercepting
 interchange
-intercourse
 interest
 interested
 interesting
@@ -6637,7 +6629,6 @@ lurked
 lurking
 lurves
 luscious
-lust
 luuuuurves
 lyall
 lycanthropic
@@ -7938,7 +7929,6 @@ patted
 pattern
 patterns
 paupers
-pawn
 pawns
 paws
 pay
@@ -10266,7 +10256,6 @@ snapped
 snare
 snargaluff
 snarled
-snatch
 snatcher
 snatchers
 snatches
@@ -10838,10 +10827,8 @@ successor
 succumb
 suceeds
 such
-suck
 sucked
 sucking
-sucks
 sudan
 sudanese
 sudden

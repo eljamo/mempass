@@ -806,7 +806,6 @@ baldwin
 balhoon
 ball
 balloon
-balls
 balor
 baltazar
 bambera
@@ -975,7 +974,6 @@ besieged
 bessie
 best
 bested
-bestial
 bestowed
 beta
 betamax
@@ -1069,7 +1067,6 @@ blontt
 blood
 blooded
 bloodsman
-bloody
 blooms
 blow
 blowing
@@ -1803,7 +1800,6 @@ clung
 clutches
 clutha
 clyde
-cnut
 coal
 coalesded
 coalition
@@ -2443,7 +2439,6 @@ damages
 damaging
 dame
 damian
-damn
 damned
 dance
 danced
@@ -2770,7 +2765,6 @@ diamonds
 diaries
 diary
 dice
-dick
 dickens
 dicky
 dictator
@@ -3126,7 +3120,6 @@ dwarf
 dwarfed
 dwell
 dying
-dyke
 dylan
 dynamically
 dynamite
@@ -4511,7 +4504,6 @@ guide
 guidebooks
 guided
 guiding
-guido
 guild
 guile
 guileful
@@ -4703,7 +4695,6 @@ heligan
 helion
 helios
 helix
-hell
 hellfire
 hello
 hellscape
@@ -5929,7 +5920,6 @@ logopolitans
 logs
 loka
 lokhus
-lolita
 london
 londoners
 lone
@@ -6678,7 +6668,6 @@ nature
 naughty
 navigate
 navy
-nazi
 nazis
 ncuti
 neal
@@ -6833,7 +6822,6 @@ november
 novice
 nowhere
 nuclear
-nude
 nuisance
 nullifying
 number
@@ -9015,7 +9003,6 @@ sewers
 sewn
 sexual
 sexuality
-sexy
 seymour
 shackleton
 shada
@@ -9820,7 +9807,6 @@ succumb
 succumbed
 succumbing
 such
-suck
 sucked
 sucker
 sucking

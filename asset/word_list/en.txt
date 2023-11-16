@@ -3892,7 +3892,6 @@ dotted
 double
 doubling
 doubt
-douche
 doug
 douglas
 dove
@@ -5796,7 +5795,6 @@ groom
 groove
 grooving
 groovy
-grope
 gross
 ground
 groundhog
@@ -5984,7 +5982,6 @@ harbor
 harbour
 hard
 hardcopy
-hardcore
 hardcover
 harddisk
 hardened
@@ -9058,7 +9055,6 @@ panther
 pantomime
 pantry
 pants
-panty
 pantyhose
 paparazzi
 papaya
@@ -12819,7 +12815,6 @@ swimming
 swimsuit
 swimwear
 swing
-swinger
 swingers
 swinging
 swipe

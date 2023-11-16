@@ -841,7 +841,6 @@ aspect
 aspects
 asphodel
 aspire
-ass
 assail
 assailed
 assailing
@@ -1167,7 +1166,6 @@ basis
 basket
 basking
 basso
-bastards
 bastion
 bastions
 bath
@@ -1385,7 +1383,6 @@ besotted
 besought
 best
 bested
-bestial
 bestiary
 bestirred
 bestow
@@ -1550,7 +1547,6 @@ bloodline
 bloodlines
 bloodshot
 bloodstained
-bloody
 bloom
 blooting
 blossom
@@ -1638,7 +1634,6 @@ bom
 bombadil
 bombur
 bond
-bondage
 bonds
 bondsman
 bone
@@ -2020,7 +2015,6 @@ busy
 busybody
 but
 butler
-butt
 butter
 butterbur
 buttercups
@@ -2431,7 +2425,6 @@ chimneys
 chin
 china
 chine
-chink
 chinks
 chins
 chip
@@ -2651,9 +2644,6 @@ coax
 cobas
 cobweb
 cobwebs
-cock
-cocking
-cocks
 coerced
 coexisted
 coffer
@@ -3862,7 +3852,6 @@ dialogue
 diamond
 diamonds
 diary
-dick
 dictionary
 did
 die
@@ -3885,7 +3874,6 @@ digging
 diggle
 dignity
 digression
-dike
 dikes
 diligent
 dillo
@@ -4114,7 +4102,6 @@ dominance
 dominant
 dominate
 dominated
-domination
 dominion
 dominions
 donald
@@ -4845,7 +4832,6 @@ escaped
 escapes
 escaping
 escarpment
-escort
 esgalduin
 esgaroth
 esmeralda
@@ -5102,7 +5088,6 @@ fades
 fading
 faelivrin
 faerie
-faggot
 faggots
 fail
 failed
@@ -5393,7 +5378,6 @@ finely
 finest
 finger
 fingered
-fingering
 fingers
 finglas
 fingolfin
@@ -6384,7 +6368,6 @@ groan
 groaned
 groaning
 grond
-grope
 groped
 groping
 gross
@@ -6764,7 +6747,6 @@ heirs
 helcar
 held
 helevorn
-hell
 hells
 helluin
 helm
@@ -6925,7 +6907,6 @@ hits
 hive
 hlothran
 hmm
-hoar
 hoard
 hoarded
 hoards
@@ -7023,7 +7004,6 @@ horned
 hornets
 hornrock
 horns
-horny
 horrible
 horribly
 horror
@@ -7829,7 +7809,6 @@ knife
 knight
 knights
 knives
-knob
 knobbed
 knock
 knocked
@@ -8389,7 +8368,6 @@ lurking
 lurks
 lurtz
 lush
-lust
 luthien
 luvailin
 lying
@@ -9052,7 +9030,6 @@ mrs
 much
 mud
 muddy
-muff
 muffled
 mug
 mugs
@@ -9338,7 +9315,6 @@ niphredil
 nirnaeth
 nivrim
 noakes
-nob
 nobility
 noble
 nobleman
@@ -10836,7 +10812,6 @@ ransom
 ransomed
 rant
 ranugad
-rape
 rapid
 rapidly
 rapids

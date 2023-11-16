@@ -1463,7 +1463,6 @@ business
 businessman
 bustling
 but
-butt
 butter
 butterfly
 butterflying
@@ -3012,7 +3011,6 @@ dolsan
 dolucar
 dome
 domicile
-domination
 dominik
 domino
 domrai
@@ -3454,7 +3452,6 @@ escaping
 escapist
 escarpment
 escarte
-escort
 escorting
 escorts
 esooma
@@ -3716,7 +3713,6 @@ featurette
 featuring
 febrini
 february
-fecal
 fecklen
 federation
 feeds
@@ -6318,7 +6314,6 @@ luring
 lusaanda
 lusankya
 lush
-lust
 lutha
 luthen
 luudria
@@ -7767,7 +7762,6 @@ patty
 pau
 paul
 pause
-pawn
 paying
 payment
 pays
@@ -8086,7 +8080,6 @@ ponda
 ponds
 pong
 pontel
-poof
 pooja
 popular
 populated

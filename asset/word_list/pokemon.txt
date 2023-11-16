@@ -524,7 +524,6 @@ ballet
 ballimere
 ballonlea
 balloon
-balls
 balm
 baltoy
 bamboo
@@ -2094,7 +2093,6 @@ dilford
 diligent
 dimensions
 ding
-dink
 dino
 dinosaur
 dipplin
@@ -3539,7 +3537,6 @@ hapu
 harapeko
 harbor
 hard
-hardcore
 harden
 hardened
 harder
@@ -4229,7 +4226,6 @@ klinklang
 klutz
 knife
 knight
-knob
 knock
 knocked
 knocking
@@ -4528,7 +4524,6 @@ logo
 logos
 lokix
 lola
-lolita
 lombre
 lone
 lonely
@@ -5645,7 +5640,6 @@ patterned
 pawmi
 pawmo
 pawmot
-pawn
 pawniard
 pay
 payapa
@@ -7309,7 +7303,6 @@ snake
 snap
 snaps
 snarl
-snatch
 snatcher
 snatchers
 sneak
