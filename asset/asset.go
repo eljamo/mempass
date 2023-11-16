@@ -15,18 +15,16 @@ var Files embed.FS
 
 func keyToTXTFile(key string) (string, bool) {
 	fileMap := map[string]string{
-		config.ALL:                       "all.txt",
-		config.DOCTOR_TREK_WARS:          "dw_st_sw.txt",
-		config.DOCTOR_WHO:                "doctor_who.txt",
-		config.EN:                        "en.txt",
-		config.EN_SMALL:                  "en_small.txt",
-		config.FANDOM_ALL:                "fandom_all.txt",
-		config.GAME_OF_STAR_WIZARD_RINGS: "got_hp_lotr_sw.txt",
-		config.GAME_OF_THRONES:           "game_of_thrones.txt",
-		config.HARRY_POTTER:              "harry_potter.txt",
-		config.LORD_OF_THE_RINGS:         "lord_of_the_rings.txt",
-		config.STAR_TREK:                 "star_trek.txt",
-		config.STAR_WARS:                 "star_wars.txt",
+		config.ALL:             "all.txt",
+		config.DOCTOR_WHO:      "doctor_who.txt",
+		config.EN:              "en.txt",
+		config.EN_SMALL:        "en_small.txt",
+		config.GAME_OF_THRONES: "game_of_thrones.txt",
+		config.HARRY_POTTER:    "harry_potter.txt",
+		config.MIDDLE_EARTH:    "middle_earth.txt",
+		config.POKEMON:         "pokemon.txt",
+		config.STAR_TREK:       "star_trek.txt",
+		config.STAR_WARS:       "star_wars.txt",
 	}
 
 	file, ok := fileMap[strings.ToUpper(key)]

@@ -39,7 +39,7 @@ Flags:
   -v, --version                         version for mempass
       --word_length_max int             maximum word length, valid values: 1+ (default 8)
       --word_length_min int             minimum word length, valid values: 1+ (default 4)
-      --word_list string                use a built-in list of words. Valid values: ALL, DOCTOR_TREK_WARS, DOCTOR_WHO, EN, EN_SMALL, FANDOM_ALL, GAME_OF_STAR_WIZARD_RINGS, GAME_OF_THRONES, HARRY_POTTER, LORD_OF_THE_RINGS, STAR_TREK, STAR_WARS (default "EN")
+      --word_list string                use a built-in list of words. Valid values: ALL, DOCTOR_WHO, EN, EN_SMALL, GAME_OF_THRONES, HARRY_POTTER, MIDDLE_EARTH, STAR_TREK, STAR_WARS (default "EN")
 ```
 
 ### Using the built-in default preset
@@ -94,10 +94,10 @@ GRAY-jury-special-FORMER-helping-ALGERIA-networks-precise-quoted-ELECTRO-53_
 WALKING-advanced-MUSLIM-review-KNOW-hughes-spas-PHYS-FARM-GOSSIP-12=
 ```
 
-### Using the built-in XKCD preset to generate passwords using the Lord of the Rings word list
+### Using the built-in XKCD preset to generate passwords using the Middle Earth word list
 
 ```
-~ $ mempass --preset XKCD --word_list LORD_OF_THE_RINGS
+~ $ mempass --preset XKCD --word_list MIDDLE_EARTH
 LEGOLAS-SPEAKS-clinking-anigh-79%
 CAIRN-CLOSED-CLOUD-TOMB-70@
 thudding-spotted-legends-TEMPERS-99?
@@ -134,15 +134,8 @@ __43:RATIOS:jobs:baghdad:37__
 
 ### To-do list
 
-* Update word lists below so they exceed 8000+ words
-  * Doctor Who
-  * Game of Thrones
-  * Harry Potter
-  * Star Trek
-  * Star Wars
 * Make word lists for
   * Ancient History & Mythology
   * Bloodborne, Dark Souls, Demon's Souls, Elden Ring and Sekiro
   * Dungeons & Dragons
-  * Pokémon
   * Warhammer

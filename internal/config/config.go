@@ -1,18 +1,16 @@
 package config
 
 const (
-	ALL                       string = "ALL"
-	DOCTOR_TREK_WARS          string = "DOCTOR_TREK_WARS"
-	DOCTOR_WHO                string = "DOCTOR_WHO"
-	EN                        string = "EN"
-	EN_SMALL                  string = "EN_SMALL"
-	FANDOM_ALL                string = "FANDOM_ALL"
-	GAME_OF_STAR_WIZARD_RINGS string = "GAME_OF_STAR_WIZARD_RINGS"
-	GAME_OF_THRONES           string = "GAME_OF_THRONES"
-	HARRY_POTTER              string = "HARRY_POTTER"
-	LORD_OF_THE_RINGS         string = "LORD_OF_THE_RINGS"
-	STAR_TREK                 string = "STAR_TREK"
-	STAR_WARS                 string = "STAR_WARS"
+	ALL             string = "ALL"
+	DOCTOR_WHO      string = "DOCTOR_WHO"
+	EN              string = "EN"
+	EN_SMALL        string = "EN_SMALL"
+	GAME_OF_THRONES string = "GAME_OF_THRONES"
+	HARRY_POTTER    string = "HARRY_POTTER"
+	MIDDLE_EARTH    string = "MIDDLE_EARTH"
+	POKEMON         string = "POKEMON"
+	STAR_TREK       string = "STAR_TREK"
+	STAR_WARS       string = "STAR_WARS"
 )
 
 const (
@@ -63,8 +61,7 @@ var (
 		[]string{RANDOM}, DefaultSpecialCharacters...,
 	)
 	WordLists = []string{
-		ALL, DOCTOR_TREK_WARS, DOCTOR_WHO, EN, EN_SMALL, FANDOM_ALL,
-		GAME_OF_STAR_WIZARD_RINGS, GAME_OF_THRONES, HARRY_POTTER, LORD_OF_THE_RINGS,
+		ALL, DOCTOR_WHO, EN, EN_SMALL, GAME_OF_THRONES, HARRY_POTTER, MIDDLE_EARTH,
 		STAR_TREK, STAR_WARS,
 	}
 )
@@ -95,18 +92,16 @@ type Config struct {
 }
 
 var WordListDescriptionMap = map[string]string{
-	ALL:                       "A combination of all word lists (28800+ words)",
-	DOCTOR_TREK_WARS:          "A combination of the Doctor Who, Star Trek, and Star Wars word lists (7700+ words)",
-	DOCTOR_WHO:                "A Doctor Who word list (2400+ words)",
-	EN:                        "A list of English words (14900+ words)",
-	EN_SMALL:                  "A small list of English words (8600+ words)",
-	FANDOM_ALL:                "A combination of all fandom word lists (15700+ words)",
-	GAME_OF_STAR_WIZARD_RINGS: "A combination of the Game of Thrones, Harry Potter, Lord of the Rings, and Star Wars word lists (13500+ words)",
-	GAME_OF_THRONES:           "A Game of Thrones word list (3900+ words)",
-	HARRY_POTTER:              "A Harry Potter word list (4500+ words)",
-	LORD_OF_THE_RINGS:         "A Lord of the Rings word list (8100+ words)",
-	STAR_TREK:                 "A Star Trek word list (3900+ words)",
-	STAR_WARS:                 "A Star Wars word list (3900+ words)",
+	ALL:             "A combination of all word lists (44900+ words)",
+	DOCTOR_WHO:      "A Doctor Who word list (11300+ words)",
+	EN:              "A list of English words (14900+ words)",
+	EN_SMALL:        "A small list of English words (8600+ words)",
+	GAME_OF_THRONES: "A Game of Thrones word list (8200+ words)",
+	HARRY_POTTER:    "A Harry Potter word list (12500+ words)",
+	MIDDLE_EARTH:    "A Middle Earth word list containing words from The Hobbit, Lord of the Rings, The Silmarillion, and more (15400+ words)",
+	POKEMON:         "A Pokemon word list (9000+ words)",
+	STAR_TREK:       "A Star Trek word list (8000+ words)",
+	STAR_WARS:       "A Star Wars word list (12000+ words)",
 }
 
 var PresetDescriptionMap = map[string]string{
