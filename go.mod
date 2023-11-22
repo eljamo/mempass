@@ -1,6 +1,6 @@
 module github.com/eljamo/mempass
 
-go 1.21.3
+go 1.21.4
 
 require (
 	github.com/spf13/cobra v1.8.0

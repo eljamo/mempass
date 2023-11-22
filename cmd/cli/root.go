@@ -10,26 +10,52 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "1.0.2"
+var version = "1.1.0"
 
 var rootCmd = &cobra.Command{
-	Use:     "mempass",
-	Version: version,
-	Short:   "A memorable password generator",
-	Long:    `A memorable password generator, a CLI version of xkpasswd.net written in Go`,
+	Use:          "mempass",
+	Version:      version,
+	Short:        "A memorable password generator",
+	Long:         `A memorable password generator, a CLI version of xkpasswd.net written in Go`,
+	SilenceUsage: true, // do not print usage when an error occurs since usage is large and distracts from the error
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, err := generateConfig(cmd, args)
 		if err != nil {
 			return err
 		}
 
-		ps := service.NewPasswordGeneratorService(cfg)
-		pw, err := ps.Generate()
+		rngs := service.NewRNGService()
+		wls, err := service.NewWordListService(cfg, rngs)
 		if err != nil {
 			return err
 		}
 
-		for _, p := range pw {
+		ts, err := service.NewTransformerService(cfg, rngs)
+		if err != nil {
+			return err
+		}
+
+		ss, err := service.NewSeparatorService(cfg, rngs)
+		if err != nil {
+			return err
+		}
+
+		ps, err := service.NewPaddingService(cfg, rngs)
+		if err != nil {
+			return err
+		}
+
+		pgs, err := service.NewPasswordGeneratorService(cfg, ts, ss, ps, wls)
+		if err != nil {
+			return err
+		}
+
+		pws, err := pgs.Generate()
+		if err != nil {
+			return err
+		}
+
+		for _, p := range pws {
 			fmt.Println(p)
 		}
 
@@ -53,7 +79,7 @@ func init() {
 	wlcss := strings.Join(config.WordLists, ", ")
 
 	rootCmd.Flags().String(
-		"preset", config.DEFAULT,
+		"preset", config.Default,
 		fmt.Sprintf("use a built-in preset. Valid values: %s", ccss),
 	)
 	rootCmd.Flags().String(
@@ -82,12 +108,12 @@ func init() {
 		"maximum word length, valid values: 1+",
 	)
 	rootCmd.Flags().String(
-		"case_transform", config.RANDOM,
+		"case_transform", config.Random,
 		fmt.Sprintf("case transformation, allowed values: %s", ttcss),
 	)
 	rootCmd.Flags().String(
 		"separator_character",
-		config.RANDOM,
+		config.Random,
 		fmt.Sprintf("character to separate password parts, example values: %s", pcasccss),
 	)
 	rootCmd.Flags().StringSlice(
@@ -109,7 +135,7 @@ func init() {
 	)
 	rootCmd.Flags().String(
 		"padding_character",
-		config.RANDOM,
+		config.Random,
 		fmt.Sprintf("character to pad the password with, example values: %s", pcasccss),
 	)
 	rootCmd.Flags().StringSlice(

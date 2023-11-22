@@ -1,38 +1,42 @@
 package service
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/eljamo/mempass/asset"
 	"github.com/eljamo/mempass/internal/config"
 )
 
 type WordListService interface {
-	GetWords(num int) ([]string, error)
+	GetWords() ([]string, error)
 }
 
 type DefaultWordListService struct {
 	cfg      *config.Config
-	rng      RNGService
-	wordList [][]byte
+	rngSvc   RNGService
+	wordList []string
 }
 
-func NewWordListService(cfg *config.Config, rng RNGService) (*DefaultWordListService, error) {
-	wl, err := getWordList(cfg.WordList, cfg.WordLengthMin, cfg.WordLengthMax)
+func NewWordListService(cfg *config.Config, rngSvc RNGService) (*DefaultWordListService, error) {
+	if cfg.NumWords < 2 {
+		return nil, errors.New("num_words must be greater than or equal to 2")
+	}
+
+	wordList, err := getWordList(cfg.WordList, cfg.WordLengthMin, cfg.WordLengthMax)
 	if err != nil {
-		return &DefaultWordListService{}, err
+		return nil, err
 	}
 
 	return &DefaultWordListService{
 		cfg,
-		rng,
-		wl,
+		rngSvc,
+		wordList,
 	}, nil
 }
 
-func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([][]byte, error) {
+func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([]string, error) {
 	if wordMaxLength < wordMinLength {
 		return nil, fmt.Errorf("word_length_max (%d) must be greater than or equal to word_length_min (%d)", wordMaxLength, wordMinLength)
 	}
@@ -42,54 +46,35 @@ func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([][]byt
 		return nil, err
 	}
 
-	aw, err := bytes.Split(wl, []byte("\n")), nil
-	if err != nil {
-		return nil, err
-	}
-
-	var fw [][]byte
+	aw := strings.Split(string(wl), "\n")
+	var fw []string
 
 	for _, word := range aw {
 		if len(word) >= wordMinLength && len(word) <= wordMaxLength {
-			fw = append(fw, word)
+			fw = append(fw, string(word))
 		}
 	}
 
 	if len(fw) == 0 {
-		return nil, fmt.Errorf("no words found in word list %s with minimum length of %d and maximum length of %d", wordList, wordMinLength, wordMaxLength)
+		return nil, fmt.Errorf("no words found in word list %s with a word_length_min of %d and word_length_max of %d", wordList, wordMinLength, wordMaxLength)
 	}
 
 	return fw, nil
 }
 
-func (s *DefaultWordListService) getWord() (string, error) {
-	num, err := s.rng.GenerateN(len(s.wordList))
+func (s *DefaultWordListService) GetWords() ([]string, error) {
+	wll := len(s.wordList)
+	wn, err := s.rngSvc.GenerateSliceWithMax(s.cfg.NumWords, wll)
 	if err != nil {
-		return "", err
-	}
-	w := string(s.wordList[int64(num)])
-
-	return w, nil
-}
-
-func (s *DefaultWordListService) GetWords(num int) ([]string, error) {
-	if num < 2 {
-		return nil, errors.New("num_words must be greater than or equal to 2")
+		return nil, err
 	}
 
-	wl := make([]string, 0, num)
-
-	for {
-		if len(wl) == num {
-			break
+	wl := make([]string, s.cfg.NumWords)
+	for i, idx := range wn {
+		if idx < 0 || idx >= wll {
+			return nil, fmt.Errorf("number (%d) given out of range of word list (%d)", idx, wll)
 		}
-
-		word, err := s.getWord()
-		if err != nil {
-			return wl, err
-		}
-
-		wl = append(wl, word)
+		wl[i] = s.wordList[idx]
 	}
 
 	return wl, nil

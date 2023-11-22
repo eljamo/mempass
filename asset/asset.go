@@ -13,97 +13,82 @@ import (
 //go:embed preset/* word_list/*
 var Files embed.FS
 
-func keyToTXTFile(key string) (string, bool) {
-	fileMap := map[string]string{
-		config.ALL:             "all.txt",
-		config.DOCTOR_WHO:      "doctor_who.txt",
-		config.EN:              "en.txt",
-		config.EN_SMALL:        "en_small.txt",
-		config.GAME_OF_THRONES: "game_of_thrones.txt",
-		config.HARRY_POTTER:    "harry_potter.txt",
-		config.MIDDLE_EARTH:    "middle_earth.txt",
-		config.POKEMON:         "pokemon.txt",
-		config.STAR_TREK:       "star_trek.txt",
-		config.STAR_WARS:       "star_wars.txt",
-	}
+var fileMap = map[string]map[string]string{
+	config.PresetKey: {
+		config.AppleID:       "appleid.json",
+		config.Default:       "default.json",
+		config.NTLM:          "ntlm.json",
+		config.SecurityQ:     "securityq.json",
+		config.Web16:         "web16.json",
+		config.Web16XKPasswd: "web16_xkpasswd.json",
+		config.Web32:         "web32.json",
+		config.WiFi:          "wifi.json",
+		config.XKCD:          "xkcd.json",
+		config.XKCDXKPasswd:  "xkcd_xkpasswd.json",
+	},
+	config.WordListKey: {
+		config.All:           "all.txt",
+		config.DoctorWho:     "doctor_who.txt",
+		config.EN:            "en.txt",
+		config.ENSmall:       "en_small.txt",
+		config.GameOfThrones: "game_of_thrones.txt",
+		config.HarryPotter:   "harry_potter.txt",
+		config.MiddleEarth:   "middle_earth.txt",
+		config.Pokemon:       "pokemon.txt",
+		config.StarTrek:      "star_trek.txt",
+		config.StarWars:      "star_wars.txt",
+	},
+}
 
-	file, ok := fileMap[strings.ToUpper(key)]
+func keyToFile(key, fileType string) (string, bool) {
+	file, ok := fileMap[fileType][strings.ToUpper(key)]
 	return file, ok
 }
 
-func keyToJSONFile(key string) (string, bool) {
-	fileMap := map[string]string{
-		config.APPLEID:        "appleid.json",
-		config.DEFAULT:        "default.json",
-		config.NTLM:           "ntlm.json",
-		config.SECURITYQ:      "securityq.json",
-		config.WEB16:          "web16.json",
-		config.WEB16_XKPASSWD: "web16_xkpasswd.json",
-		config.WEB32:          "web32.json",
-		config.WIFI:           "wifi.json",
-		config.XKCD:           "xkcd.json",
-		config.XKCD_XKPASSWD:  "xkcd_xkpasswd.json",
-	}
-
-	file, ok := fileMap[strings.ToUpper(key)]
-	return file, ok
-}
-
-func readJSONFileData(filePath string, readerFunc func(string) ([]byte, error)) (string, error) {
+func loadFileData(filePath string, readerFunc func(string) ([]byte, error)) (string, error) {
 	data, err := readerFunc(filePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file: %s", err)
+		return "", fmt.Errorf("failed to read file '%s': %w", filePath, err)
 	}
 
 	var parsed any
 	if err := json.Unmarshal(data, &parsed); err != nil {
-		return "", fmt.Errorf("invalid JSON content: %s", err)
+		return "", fmt.Errorf("invalid JSON content in '%s': %w", filePath, err)
 	}
 
-	return string(data), nil
-}
+	jsonData, err := json.Marshal(parsed)
+	if err != nil {
+		return "", fmt.Errorf("error marshaling JSON data from '%s': %w", filePath, err)
+	}
 
-func loadEmbeddedJSONFile(filePath string) (string, error) {
-	return readJSONFileData(filePath, Files.ReadFile)
+	return string(jsonData), nil
 }
 
 func LoadJSONFile(filePath string) (string, error) {
-	return readJSONFileData(filePath, os.ReadFile)
+	return loadFileData(filePath, os.ReadFile)
 }
 
-func loadTXTFile(filePath string) ([]byte, error) {
+func GetWordList(key string) ([]byte, error) {
+	fileName, ok := keyToFile(key, config.WordListKey)
+	if !ok {
+		return nil, fmt.Errorf("invalid word list key '%s'", key)
+	}
+
+	filePath := fmt.Sprintf("%s/%s", config.WordListKey, fileName)
 	data, err := Files.ReadFile(filePath)
 	if err != nil {
-		return make([]byte, 0), fmt.Errorf("failed to read embedded file: %s", err)
+		return nil, fmt.Errorf("failed to read embedded text file '%s': %w", filePath, err)
 	}
 
 	return data, nil
 }
 
-func GetWordList(key string) ([]byte, error) {
-	fileName, ok := keyToTXTFile(key)
-	if !ok {
-		return make([]byte, 0), fmt.Errorf("invalid %s name: %s", config.WORD_LIST_KEY, key)
-	}
-
-	content, err := loadTXTFile(fmt.Sprintf("%s/%s", config.WORD_LIST_KEY, fileName))
-	if err != nil {
-		return make([]byte, 0), err
-	}
-
-	return content, nil
-}
-
 func GetJSONPreset(key string) (string, error) {
-	fileName, ok := keyToJSONFile(key)
+	fileName, ok := keyToFile(key, config.PresetKey)
 	if !ok {
-		return "", fmt.Errorf("invalid %s name: %s", config.PRESET_KEY, key)
+		return "", fmt.Errorf("invalid JSON preset key '%s'", key)
 	}
 
-	content, err := loadEmbeddedJSONFile(fmt.Sprintf("%s/%s", config.PRESET_KEY, fileName))
-	if err != nil {
-		return "", err
-	}
-
-	return content, nil
+	filePath := fmt.Sprintf("%s/%s", config.PresetKey, fileName)
+	return loadFileData(filePath, Files.ReadFile)
 }

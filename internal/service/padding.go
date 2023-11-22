@@ -1,12 +1,13 @@
 package service
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/eljamo/mempass/internal/config"
+	stringcheck "github.com/eljamo/mempass/internal/string_check"
 )
 
 type PaddingService interface {
@@ -14,12 +15,18 @@ type PaddingService interface {
 }
 
 type DefaultPaddingService struct {
-	cfg *config.Config
-	rng RNGService
+	cfg    *config.Config
+	rngSvc RNGService
 }
 
-func NewPaddingService(cfg *config.Config, rng RNGService) *DefaultPaddingService {
-	return &DefaultPaddingService{cfg, rng}
+func NewPaddingService(cfg *config.Config, rngSvc RNGService) (*DefaultPaddingService, error) {
+	svc := &DefaultPaddingService{cfg, rngSvc}
+
+	if err := svc.validate(); err != nil {
+		return nil, err
+	}
+
+	return svc, nil
 }
 
 func (s *DefaultPaddingService) Pad(slice []string) (string, error) {
@@ -41,11 +48,8 @@ func (s *DefaultPaddingService) Pad(slice []string) (string, error) {
 
 func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 	before, after := s.cfg.PaddingDigitsBefore, s.cfg.PaddingDigitsAfter
-	if before < 0 || after < 0 {
-		return nil, fmt.Errorf("padding_digits_before and padding_digits_after must be greater than or equal to 0")
-	}
-
 	paddedSlice := make([]string, 0, before+len(slice)+after)
+
 	rdb, err := s.generateRandomDigits(before)
 	if err != nil {
 		return nil, err
@@ -67,7 +71,7 @@ func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 func (s *DefaultPaddingService) generateRandomDigits(count int) ([]string, error) {
 	digits := make([]string, 0, count)
 	for i := 0; i < count; i++ {
-		num, err := s.rng.GenerateN(10)
+		num, err := s.rngSvc.GenerateWithMax(maxDigit)
 		if err != nil {
 			return nil, err
 		}
@@ -101,11 +105,11 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	}
 
 	switch s.cfg.PaddingType {
-	case config.FIXED:
-		return s.fixed(pw, char, s.cfg.PaddingCharactersBefore, s.cfg.PaddingCharactersAfter)
-	case config.ADAPTIVE:
-		return s.adaptive(pw, char, s.cfg.PadToLength)
-	case config.NONE:
+	case config.Fixed:
+		return s.fixed(pw, char)
+	case config.Adaptive:
+		return s.adaptive(pw, char)
+	case config.None:
 		return pw, nil
 	}
 
@@ -113,8 +117,8 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 }
 
 func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
-	if s.cfg.PaddingCharacter == config.RANDOM {
-		num, err := s.rng.GenerateN(len(s.cfg.SymbolAlphabet))
+	if s.cfg.PaddingCharacter == config.Random {
+		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SymbolAlphabet))
 		if err != nil {
 			return "", err
 		}
@@ -124,22 +128,15 @@ func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
 	return s.cfg.PaddingCharacter, nil
 }
 
-func (s *DefaultPaddingService) fixed(pw string, char string, before int, after int) (string, error) {
-	if before < 0 || after < 0 {
-		return "", fmt.Errorf("padding_characters_before and padding_characters_after must be greater than or equal to 0")
-	}
-
-	paddingBefore := strings.Repeat(char, before)
-	paddingAfter := strings.Repeat(char, after)
+func (s *DefaultPaddingService) fixed(pw string, char string) (string, error) {
+	paddingBefore := strings.Repeat(char, s.cfg.PaddingCharactersBefore)
+	paddingAfter := strings.Repeat(char, s.cfg.PaddingCharactersAfter)
 
 	return paddingBefore + pw + paddingAfter, nil
 }
 
-func (s *DefaultPaddingService) adaptive(pw string, char string, padLen int) (string, error) {
-	if padLen < 0 {
-		return "", fmt.Errorf("pad_to_length must be greater than or equal to 0")
-	}
-
+func (s *DefaultPaddingService) adaptive(pw string, char string) (string, error) {
+	padLen := s.cfg.PadToLength
 	pwLen := utf8.RuneCountInString(pw)
 	if padLen <= pwLen {
 		return pw, nil
@@ -149,4 +146,36 @@ func (s *DefaultPaddingService) adaptive(pw string, char string, padLen int) (st
 	padding := strings.Repeat(char, diff)
 
 	return pw + padding, nil
+}
+
+func (s *DefaultPaddingService) validate() error {
+	if s.cfg.PaddingType != config.None && s.cfg.PaddingCharacter != config.Random && len(s.cfg.PaddingCharacter) > 1 {
+		return errors.New("padding_character must be a single character if specified")
+	}
+
+	if s.cfg.PaddingCharacter == config.Random {
+		sa := s.cfg.SymbolAlphabet
+		if len(sa) == 0 {
+			return errors.New("symbol_alphabet cannot be empty")
+		}
+
+		chk := stringcheck.CheckStringLengths(sa)
+		if chk == false {
+			return errors.New("symbol_alphabet cannot contain elements with length greater than 1")
+		}
+	}
+
+	if s.cfg.PaddingDigitsBefore < 0 || s.cfg.PaddingDigitsAfter < 0 {
+		return errors.New("padding_digits_before and padding_digits_after must be greater than or equal to 0")
+	}
+
+	if s.cfg.PaddingCharactersBefore < 0 || s.cfg.PaddingCharactersAfter < 0 {
+		return errors.New("padding_characters_before and padding_characters_after must be greater than or equal to 0")
+	}
+
+	if s.cfg.PadToLength < 0 {
+		return errors.New("pad_to_length must be greater than or equal to 0")
+	}
+
+	return nil
 }

@@ -1,20 +1,72 @@
 package service
 
 import (
-	"errors"
 	"slices"
 	"testing"
 
 	"github.com/eljamo/mempass/internal/config"
 )
 
+func TestNewSeparatorService(t *testing.T) {
+	t.Parallel()
+
+	mockRNGService := &MockRNGService{}
+
+	tests := []struct {
+		name    string
+		cfg     *config.Config
+		wantErr bool
+	}{
+		{
+			name:    "Valid configuration",
+			cfg:     &config.Config{SeparatorCharacter: "*", SeparatorAlphabet: []string{"!", "@", "#", "$", "%"}},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid configuration - invalid separator character",
+			cfg:     &config.Config{SeparatorCharacter: "invalid"},
+			wantErr: true,
+		},
+		{
+			name:    "Valid configuration - separator alphabet",
+			cfg:     &config.Config{SeparatorCharacter: config.Random, SeparatorAlphabet: []string{""}},
+			wantErr: false,
+		},
+
+		{
+			name:    "Valid configuration - separator alphabet",
+			cfg:     &config.Config{SeparatorCharacter: config.Random, SeparatorAlphabet: []string{"a"}},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid configuration - empty separator alphabet",
+			cfg:     &config.Config{SeparatorCharacter: config.Random, SeparatorAlphabet: []string{"aaa"}},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			_, err := NewSeparatorService(tt.cfg, mockRNGService)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewSeparatorService() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestSeparatorService_Separate(t *testing.T) {
-	rngs := NewMockRNGService()
-	erngs := NewMockEvenRNGService()
+	t.Parallel()
+
+	rngs := &MockRNGService{}
+	erngs := &MockEvenRNGService{}
+
 	tests := []struct {
 		name      string
 		cfg       *config.Config
-		rng       RNGService
+		rngSvc    RNGService
 		input     []string
 		expected  []string
 		expectErr error
@@ -22,43 +74,44 @@ func TestSeparatorService_Separate(t *testing.T) {
 		{
 			name:     "With fixed separator",
 			cfg:      &config.Config{SeparatorCharacter: "-"},
-			rng:      rngs,
+			rngSvc:   rngs,
 			input:    []string{"a", "b", "c"},
 			expected: []string{"-", "a", "-", "b", "-", "c", "-"},
 		},
 		{
 			name:     "With empty slice",
 			cfg:      &config.Config{SeparatorCharacter: "-"},
-			rng:      rngs,
+			rngSvc:   rngs,
 			input:    []string{},
 			expected: []string{"-"},
 		},
 		{
 			name:     "With random separator",
-			cfg:      &config.Config{SeparatorCharacter: config.RANDOM, SeparatorAlphabet: []string{"!", "-", "="}},
-			rng:      rngs,
+			cfg:      &config.Config{SeparatorCharacter: config.Random, SeparatorAlphabet: []string{"!", "-", "="}},
+			rngSvc:   rngs,
 			input:    []string{"a", "b", "c"},
 			expected: []string{"-", "a", "-", "b", "-", "c", "-"},
 		},
 		{
 			name:     "With random separator with RNG returning a even number",
-			cfg:      &config.Config{SeparatorCharacter: config.RANDOM, SeparatorAlphabet: []string{"!", "-", "="}},
-			rng:      erngs,
+			cfg:      &config.Config{SeparatorCharacter: config.Random, SeparatorAlphabet: []string{"!", "-", "="}},
+			rngSvc:   erngs,
 			input:    []string{"a", "b", "c"},
 			expected: []string{"=", "a", "=", "b", "=", "c", "="},
-		},
-		{
-			name:      "With random separator but empty alphabet",
-			cfg:       &config.Config{SeparatorCharacter: config.RANDOM, SeparatorAlphabet: []string{}},
-			rng:       rngs,
-			input:     []string{"a", "b", "c"},
-			expectErr: errors.New("separator_alphabet cannot be empty"),
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			service := NewSeparatorService(tt.cfg, tt.rng)
+			t.Parallel()
+
+			service, err := NewSeparatorService(tt.cfg, tt.rngSvc)
+			if err != nil {
+				t.Errorf("unexpected error with service init: %s", err)
+				return
+			}
+
 			got, err := service.Separate(tt.input)
 
 			if tt.expectErr != nil {

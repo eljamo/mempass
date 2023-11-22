@@ -1,7 +1,9 @@
 package service
 
 import (
+	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/eljamo/mempass/internal/config"
 )
@@ -11,52 +13,80 @@ type PasswordGeneratorService interface {
 }
 
 type DefaultPasswordGeneratorService struct {
-	cfg *config.Config
+	cfg            *config.Config
+	transformerSvc TransformerService
+	separatorSvc   SeparatorService
+	paddingSvc     PaddingService
+	wordListSvc    WordListService
 }
 
-func NewPasswordGeneratorService(cfg *config.Config) *DefaultPasswordGeneratorService {
-	return &DefaultPasswordGeneratorService{cfg}
+func NewPasswordGeneratorService(
+	cfg *config.Config,
+	transformerSvc TransformerService,
+	separatorSvc SeparatorService,
+	paddingSvc PaddingService,
+	wordListSvc WordListService,
+) (*DefaultPasswordGeneratorService, error) {
+	np := cfg.NumPasswords
+	if np < 1 {
+		return nil, errors.New("num_passwords must be greater than 0")
+	}
+
+	return &DefaultPasswordGeneratorService{
+		cfg,
+		transformerSvc,
+		separatorSvc,
+		paddingSvc,
+		wordListSvc,
+	}, nil
 }
 
 func (s *DefaultPasswordGeneratorService) Generate() ([]string, error) {
 	np := s.cfg.NumPasswords
-	if np < 1 {
-		return nil, fmt.Errorf("num_passwords must be greater than 0")
-	}
 
-	rngs := NewRNGService()
-	wls, err := NewWordListService(s.cfg, rngs)
-	if err != nil {
-		return nil, err
-	}
+	var wg sync.WaitGroup
+	wg.Add(np)
 
-	ts := NewTransformerService(s.cfg, rngs)
-	ss := NewSeparatorService(s.cfg, rngs)
-	ps := NewPaddingService(s.cfg, rngs)
-	var pws []string
+	pws := make([]string, np)
+	errChan := make(chan error, np)
 
 	for i := 0; i < np; i++ {
-		sl, err := wls.GetWords(s.cfg.NumWords)
-		if err != nil {
-			return nil, err
-		}
+		go func(i int) {
+			defer wg.Done()
 
-		slt, err := ts.Transform(sl)
-		if err != nil {
-			return nil, err
-		}
+			sl, err := s.wordListSvc.GetWords()
+			if err != nil {
+				errChan <- err
+				return
+			}
 
-		sls, err := ss.Separate(slt)
-		if err != nil {
-			return nil, err
-		}
+			slt, err := s.transformerSvc.Transform(sl)
+			if err != nil {
+				errChan <- err
+				return
+			}
 
-		pw, err := ps.Pad(sls)
-		if err != nil {
-			return nil, err
-		}
+			sls, err := s.separatorSvc.Separate(slt)
+			if err != nil {
+				errChan <- err
+				return
+			}
 
-		pws = append(pws, pw)
+			pw, err := s.paddingSvc.Pad(sls)
+			if err != nil {
+				errChan <- err
+				return
+			}
+
+			pws[i] = pw
+		}(i)
+	}
+
+	wg.Wait()
+	close(errChan)
+
+	if len(errChan) > 0 {
+		return nil, fmt.Errorf("%w", <-errChan)
 	}
 
 	return pws, nil

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"unicode"
 
 	"github.com/eljamo/mempass/internal/config"
 	"golang.org/x/text/cases"
@@ -15,42 +16,46 @@ type TransformerService interface {
 }
 
 type DefaultTransformerService struct {
-	cfg *config.Config
-	rng RNGService
+	cfg    *config.Config
+	rngSvc RNGService
 }
 
-func NewTransformerService(cfg *config.Config, rng RNGService) *DefaultTransformerService {
-	return &DefaultTransformerService{
-		cfg,
-		rng,
+func NewTransformerService(cfg *config.Config, rngSvc RNGService) (*DefaultTransformerService, error) {
+	svc := &DefaultTransformerService{cfg, rngSvc}
+
+	if err := svc.validate(); err != nil {
+		return nil, err
 	}
+
+	return svc, nil
 }
 
 func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) {
-	err := s.validate()
-	if err != nil {
-		return []string{}, err
-	}
-
 	switch s.cfg.CaseTransform {
-	case config.ALTERNATE:
+	case config.Alternate:
 		return s.alternate(slice), nil
-	case config.CAPITALISE:
+	case config.AlternateLettercase:
+		return alternateLettercase(slice)
+	case config.Capitalise:
 		return s.capitalise(slice), nil
-	case config.INVERT:
-		return s.invert(slice), nil
-	case config.LOWER:
+	case config.CapitaliseInvert:
+		return s.capitaliseInvert(slice)
+	case config.Invert: // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net configs
+		return s.capitaliseInvert(slice)
+	case config.Lower:
 		return s.lower(slice), nil
-	case config.RANDOM:
+	case config.LowerVowelUpperConsonant:
+		return lowerVowelUpperConsonant(slice)
+	case config.Random:
 		return s.random(slice)
-	case config.UPPER:
+	case config.Upper:
 		return s.upper(slice), nil
-	case config.NONE:
+	case config.None:
 	default:
 		return slice, nil
 	}
 
-	return slice, err
+	return slice, nil
 }
 
 func (s *DefaultTransformerService) alternate(slice []string) []string {
@@ -65,6 +70,32 @@ func (s *DefaultTransformerService) alternate(slice []string) []string {
 	return slice
 }
 
+func alternateLettercase(slice []string) ([]string, error) {
+	var result []string
+	for _, str := range slice {
+		var sb strings.Builder
+		upper := false
+		for _, r := range str {
+			var err error
+			if unicode.IsLetter(r) {
+				if upper {
+					r = unicode.ToUpper(r)
+				} else {
+					r = unicode.ToLower(r)
+				}
+				upper = !upper
+			}
+			_, err = sb.WriteRune(r)
+			if err != nil {
+				return nil, err
+			}
+		}
+		result = append(result, sb.String())
+	}
+
+	return result, nil
+}
+
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
 	caser := cases.Title(language.English)
 	for i := range slice {
@@ -74,14 +105,25 @@ func (s *DefaultTransformerService) capitalise(slice []string) []string {
 	return slice
 }
 
-func (s *DefaultTransformerService) invert(slice []string) []string {
+func (s *DefaultTransformerService) capitaliseInvert(slice []string) ([]string, error) {
 	for i, w := range slice {
-		if len(w) > 1 {
-			slice[i] = string(w[0]) + strings.ToUpper(w[1:])
+		var sb strings.Builder
+		for j, r := range w {
+			if j == 0 {
+				_, err := sb.WriteRune(unicode.ToLower(r))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				_, err := sb.WriteRune(unicode.ToUpper(r))
+				if err != nil {
+					return nil, err
+				}
+			}
 		}
+		slice[i] = sb.String()
 	}
-
-	return slice
+	return slice, nil
 }
 
 func (s *DefaultTransformerService) lower(slice []string) []string {
@@ -92,9 +134,35 @@ func (s *DefaultTransformerService) lower(slice []string) []string {
 	return slice
 }
 
+func isVowel(r rune) bool {
+	return strings.ContainsRune("aeiouAEIOU", r)
+}
+
+func lowerVowelUpperConsonant(slice []string) ([]string, error) {
+	var result []string
+	for _, str := range slice {
+		var sb strings.Builder
+		for _, r := range str {
+			if isVowel(r) {
+				_, err := sb.WriteRune(unicode.ToLower(r))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				_, err := sb.WriteRune(unicode.ToUpper(r))
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		result = append(result, sb.String())
+	}
+	return result, nil
+}
+
 func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 	for i, w := range slice {
-		r, err := s.rng.Generate()
+		r, err := s.rngSvc.Generate()
 		if err != nil {
 			return nil, err
 		}
@@ -111,7 +179,7 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 
 func (s *DefaultTransformerService) validate() error {
 	if !slices.Contains(config.TransformType, s.cfg.CaseTransform) {
-		return fmt.Errorf("Invalid case_transform type: %s", s.cfg.CaseTransform)
+		return fmt.Errorf("not a valid case_transform type (%s)", s.cfg.CaseTransform)
 	}
 
 	return nil

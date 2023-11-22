@@ -8,88 +8,157 @@ import (
 	"github.com/eljamo/mempass/internal/config"
 )
 
+func TestNewPaddingService(t *testing.T) {
+	t.Parallel()
+
+	mockRNGService := &MockRNGService{}
+
+	tests := []struct {
+		name    string
+		cfg     *config.Config
+		wantErr bool
+	}{
+		{
+			name:    "Valid configuration",
+			cfg:     &config.Config{PaddingDigitsBefore: 2, PaddingDigitsAfter: 2, PaddingCharacter: "*", SymbolAlphabet: []string{"!", "@", "#", "$", "%"}, PaddingType: config.Fixed},
+			wantErr: false,
+		},
+		{
+			name:    "Invalid configuration - negative padding digits before and after",
+			cfg:     &config.Config{PaddingDigitsBefore: -1, PaddingDigitsAfter: -1},
+			wantErr: true,
+		},
+		{
+			name:    "Invalid configuration - negative padding character before and after",
+			cfg:     &config.Config{PaddingType: config.Fixed, PaddingCharactersBefore: -1, PaddingCharactersAfter: -1},
+			wantErr: true,
+		},
+		{
+			name:    "Invalid configuration - invalid padding type",
+			cfg:     &config.Config{PaddingCharacter: "invalid", PaddingType: config.Fixed},
+			wantErr: true,
+		},
+		{
+			name:    "Invalid configuration - empty symbol alphabet",
+			cfg:     &config.Config{PaddingCharacter: config.Random, SymbolAlphabet: []string{}},
+			wantErr: true,
+		},
+		{
+			name:    "Valid configuration - symbol alphabet",
+			cfg:     &config.Config{PaddingCharacter: config.Random, SymbolAlphabet: []string{""}},
+			wantErr: false,
+		},
+		{
+			name:    "Valid configuration - symbol alphabet",
+			cfg:     &config.Config{PaddingCharacter: config.Random, SymbolAlphabet: []string{"a"}},
+			wantErr: false,
+		},
+
+		{
+			name:    "Invalid configuration - too large symbol alphabet element",
+			cfg:     &config.Config{PaddingCharacter: config.Random, SymbolAlphabet: []string{"aaa"}},
+			wantErr: true,
+		},
+		{
+			name:    "Invalid configuration - invalid padding to length",
+			cfg:     &config.Config{PadToLength: -1, PaddingType: config.Adaptive},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			_, err := NewPaddingService(tt.cfg, mockRNGService)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewPaddingService() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestPad(t *testing.T) {
+	t.Parallel()
+
 	cfg := &config.Config{
 		PaddingDigitsBefore:     2,
 		PaddingDigitsAfter:      2,
 		SeparatorCharacter:      "-",
-		PaddingType:             config.FIXED,
+		PaddingType:             config.Fixed,
 		PaddingCharactersBefore: 2,
 		PaddingCharactersAfter:  2,
 		PadToLength:             20,
 		PaddingCharacter:        "*",
 		SymbolAlphabet:          []string{"!"},
 	}
-	rngs := NewMockRNGService()
-	paddingService := NewPaddingService(cfg, rngs)
-
-	input := []string{"-test-"}
-	expected := "**11-test-11**"
-
-	result, err := paddingService.Pad(input)
+	rngs := &MockRNGService{}
+	s, err := NewPaddingService(cfg, rngs)
 	if err != nil {
-		t.Errorf("Pad() error = %v, expectErr %v", err, false)
+		t.Errorf("service init error: %v", err)
 	}
-	if result != expected {
-		t.Errorf("Pad() = %v, expected %v", result, expected)
-	}
+
+	t.Run("FixedPaddingWithConfig", func(t *testing.T) {
+		input := []string{"-test-"}
+		expected := "**11-test-11**"
+
+		result, err := s.Pad(input)
+		if err != nil {
+			t.Errorf("Pad() error = %v, expectErr %v", err, false)
+		}
+		if result != expected {
+			t.Errorf("Pad() = %v, expected %v", result, expected)
+		}
+	})
 }
 
 func TestDigits(t *testing.T) {
-	rngs := NewMockRNGService()
+	t.Parallel()
+
+	rngs := &MockRNGService{}
 	tests := []struct {
-		name      string
-		input     []string
-		before    int
-		after     int
-		expected  []string
-		expectErr bool
+		name     string
+		input    []string
+		before   int
+		after    int
+		expected []string
 	}{
 		{
-			name:      "valid padding",
-			input:     []string{"a", "b", "c"},
-			expected:  []string{"1", "1", "a", "b", "c", "1", "1"},
-			before:    2,
-			after:     2,
-			expectErr: false,
+			name:     "valid padding",
+			input:    []string{"a", "b", "c"},
+			expected: []string{"1", "1", "a", "b", "c", "1", "1"},
+			before:   2,
+			after:    2,
 		},
 		{
-			name:      "no padding",
-			input:     []string{"a", "b", "c"},
-			expected:  []string{"a", "b", "c"},
-			before:    0,
-			after:     0,
-			expectErr: false,
-		},
-		{
-			name:      "negative padding before",
-			input:     []string{"a", "b", "c"},
-			before:    -1,
-			after:     0,
-			expectErr: true,
-		},
-		{
-			name:      "negative padding after",
-			input:     []string{"a", "b", "c"},
-			before:    0,
-			after:     -1,
-			expectErr: true,
+			name:     "no padding",
+			input:    []string{"a", "b", "c"},
+			expected: []string{"a", "b", "c"},
+			before:   0,
+			after:    0,
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			cfg := &config.Config{
 				PaddingDigitsBefore: tt.before,
 				PaddingDigitsAfter:  tt.after,
 			}
-			s := NewPaddingService(cfg, rngs)
-			got, err := s.digits(tt.input)
-			if (err != nil) != tt.expectErr {
-				t.Errorf("digits() error = %v, expectErr %v", err, tt.expectErr)
-				return
+
+			s, err := NewPaddingService(cfg, rngs)
+			if err != nil {
+				t.Errorf("service init error: %v", err)
 			}
-			if !tt.expectErr && !reflect.DeepEqual(got, tt.expected) {
+			got, err := s.digits(tt.input)
+			if err != nil {
+				t.Errorf("digits() error = %v", err)
+			}
+
+			if !reflect.DeepEqual(got, tt.expected) {
 				t.Errorf("digits() got = %v, expected %v", got, tt.expected)
 			}
 		})
@@ -97,6 +166,8 @@ func TestDigits(t *testing.T) {
 }
 
 func TestGenerateRandomDigits(t *testing.T) {
+	t.Parallel()
+
 	cfg := &config.Config{}
 	tests := []struct {
 		name     string
@@ -113,9 +184,15 @@ func TestGenerateRandomDigits(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			rngs := NewMockRNGService()
-			s := NewPaddingService(cfg, rngs)
+			t.Parallel()
+
+			rngs := &MockRNGService{}
+			s, err := NewPaddingService(cfg, rngs)
+			if err != nil {
+				t.Errorf("service init error: %v", err)
+			}
 
 			got, err := s.generateRandomDigits(tt.count)
 			if tt.count < 0 {
@@ -135,6 +212,8 @@ func TestGenerateRandomDigits(t *testing.T) {
 }
 
 func TestRemoveEdgeSeparatorCharacter(t *testing.T) {
+	t.Parallel()
+
 	cfg := &config.Config{SeparatorCharacter: "-"}
 
 	tests := []struct {
@@ -175,10 +254,11 @@ func TestRemoveEdgeSeparatorCharacter(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			s := &DefaultPaddingService{
-				cfg: cfg,
-			}
+			t.Parallel()
+
+			s := &DefaultPaddingService{cfg: cfg}
 			got := s.removeEdgeSeparatorCharacter(tt.input)
 			if !reflect.DeepEqual(got, tt.expected) {
 				t.Errorf("removeEdgeSeparatorCharacter() got = %v, expected %v", got, tt.expected)
@@ -188,7 +268,10 @@ func TestRemoveEdgeSeparatorCharacter(t *testing.T) {
 }
 
 func TestSymbols(t *testing.T) {
-	rngs := NewMockRNGService()
+	t.Parallel()
+
+	rngs := &MockRNGService{}
+
 	tests := []struct {
 		name       string
 		cfg        *config.Config
@@ -200,7 +283,7 @@ func TestSymbols(t *testing.T) {
 		{
 			name: "fixed padding with specific character",
 			cfg: &config.Config{
-				PaddingType:             config.FIXED,
+				PaddingType:             config.Fixed,
 				PaddingCharacter:        "*",
 				PaddingCharactersBefore: 2,
 				PaddingCharactersAfter:  2,
@@ -212,7 +295,7 @@ func TestSymbols(t *testing.T) {
 		{
 			name: "adaptive padding to specific length",
 			cfg: &config.Config{
-				PaddingType:      config.ADAPTIVE,
+				PaddingType:      config.Adaptive,
 				PaddingCharacter: "*",
 				PadToLength:      10,
 			},
@@ -222,7 +305,7 @@ func TestSymbols(t *testing.T) {
 		{
 			name: "no padding",
 			cfg: &config.Config{
-				PaddingType: config.NONE,
+				PaddingType: config.None,
 			},
 			pw:   "password",
 			want: "password",
@@ -230,8 +313,8 @@ func TestSymbols(t *testing.T) {
 		{
 			name: "random padding character",
 			cfg: &config.Config{
-				PaddingType:             config.FIXED,
-				PaddingCharacter:        config.RANDOM,
+				PaddingType:             config.Fixed,
+				PaddingCharacter:        config.Random,
 				PaddingCharactersBefore: 2,
 				PaddingCharactersAfter:  2,
 				PadToLength:             10,
@@ -243,8 +326,15 @@ func TestSymbols(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			s := NewPaddingService(tt.cfg, rngs)
+			t.Parallel()
+
+			s, err := NewPaddingService(tt.cfg, rngs)
+			if err != nil {
+				t.Errorf("service init error: %v", err)
+			}
+
 			got, err := s.symbols(tt.pw)
 			if (err != nil) != tt.expectErr {
 				t.Errorf("symbols() error = %v, expectErr %v", err, tt.expectErr)
@@ -260,7 +350,8 @@ func TestSymbols(t *testing.T) {
 }
 
 func TestFixed(t *testing.T) {
-	rngs := NewMockRNGService()
+	t.Parallel()
+
 	tests := []struct {
 		name        string
 		pw          string
@@ -272,65 +363,53 @@ func TestFixed(t *testing.T) {
 		errContains string
 	}{
 		{
-			name:   "equal padding on both sides",
-			pw:     "abc",
+			name:   "Normal Padding",
+			pw:     "password",
 			char:   "*",
 			before: 2,
-			after:  2,
-			want:   "**abc**",
+			after:  3,
+			want:   "**password***",
 		},
 		{
-			name:   "no padding",
-			pw:     "abc",
+			name:   "No Padding",
+			pw:     "password",
 			char:   "*",
 			before: 0,
 			after:  0,
-			want:   "abc",
+			want:   "password",
 		},
 		{
-			name:   "padding before only",
-			pw:     "abc",
+			name:   "Padding Before Only",
+			pw:     "password",
 			char:   "#",
-			before: 3,
+			before: 4,
 			after:  0,
-			want:   "###abc",
+			want:   "####password",
 		},
 		{
-			name:   "padding after only",
-			pw:     "abc",
+			name:   "Padding After Only",
+			pw:     "password",
 			char:   "+",
 			before: 0,
-			after:  4,
-			want:   "abc++++",
-		},
-		{
-			name:        "negative padding before",
-			pw:          "abc",
-			char:        "*",
-			before:      -1,
-			after:       2,
-			expectErr:   true,
-			errContains: "padding_characters_before and padding_characters_after must be greater than or equal to 0",
-		},
-		{
-			name:        "negative padding after",
-			pw:          "abc",
-			char:        "*",
-			before:      1,
-			after:       -2,
-			expectErr:   true,
-			errContains: "padding_characters_before and padding_characters_after must be greater than or equal to 0",
+			after:  2,
+			want:   "password++",
 		},
 	}
 
+	rngSvc := &MockEvenRNGService{}
+
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			cfg := &config.Config{
-				PaddingDigitsBefore: tt.before,
-				PaddingDigitsAfter:  tt.after,
+				PaddingCharactersBefore: tt.before,
+				PaddingCharactersAfter:  tt.after,
 			}
-			s := NewPaddingService(cfg, rngs)
-			got, err := s.fixed(tt.pw, tt.char, tt.before, tt.after)
+			svc := &DefaultPaddingService{cfg: cfg, rngSvc: rngSvc}
+
+			got, err := svc.fixed(tt.pw, tt.char)
 			if (err != nil) != tt.expectErr {
 				t.Fatalf("fixed() error = %v, expectErr %v", err, tt.expectErr)
 			}
@@ -348,68 +427,55 @@ func TestFixed(t *testing.T) {
 }
 
 func TestAdaptive(t *testing.T) {
+	t.Parallel()
+
 	cfg := &config.Config{
 		PadToLength: 10,
 	}
 
 	tests := []struct {
-		name       string
-		pw         string
-		char       string
-		padLen     int
-		want       string
-		expectErr  bool
-		errMessage string
+		name   string
+		pw     string
+		char   string
+		padLen int
+		want   string
 	}{
 		{
-			name:      "no padding needed",
-			pw:        "1234567890",
-			char:      "*",
-			padLen:    10,
-			want:      "1234567890",
-			expectErr: false,
+			name:   "no padding needed",
+			pw:     "1234567890",
+			char:   "*",
+			padLen: 10,
+			want:   "1234567890",
 		},
 		{
-			name:      "padding needed",
-			pw:        "12345",
-			char:      "*",
-			padLen:    10,
-			want:      "12345*****",
-			expectErr: false,
+			name:   "padding needed",
+			pw:     "12345",
+			char:   "*",
+			padLen: 10,
+			want:   "12345*****",
 		},
 		{
-			name:      "empty password",
-			pw:        "",
-			char:      "*",
-			padLen:    10,
-			want:      "**********",
-			expectErr: false,
-		},
-		{
-			name:       "negative pad length",
-			pw:         "12345",
-			char:       "*",
-			padLen:     -1,
-			expectErr:  true,
-			errMessage: "pad_to_length must be greater than or equal to 0",
+			name:   "empty password",
+			pw:     "",
+			char:   "*",
+			padLen: 10,
+			want:   "**********",
 		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			cfg.PadToLength = tt.padLen
-			s := &DefaultPaddingService{
-				cfg: cfg,
+			s := &DefaultPaddingService{cfg: cfg}
+			got, err := s.adaptive(tt.pw, tt.char)
+			if err != nil {
+				t.Errorf("adaptive() error = %v", err)
 			}
-			got, err := s.adaptive(tt.pw, tt.char, tt.padLen)
-			if (err != nil) != tt.expectErr {
-				t.Errorf("adaptive() error = %v, expectErr %v", err, tt.expectErr)
-				return
-			}
-			if tt.expectErr && err.Error() != tt.errMessage {
-				t.Errorf("adaptive() error = %v, expectErr message %v", err, tt.errMessage)
-			}
-			if !tt.expectErr && got != tt.want {
+
+			if got != tt.want {
 				t.Errorf("adaptive() got = %v, want %v", got, tt.want)
 			}
 		})
