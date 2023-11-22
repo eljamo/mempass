@@ -139,3 +139,13 @@ __43:RATIOS:jobs:baghdad:37__
   * Bloodborne, Dark Souls, Demon's Souls, Elden Ring and Sekiro
   * Dungeons & Dragons
   * Warhammer
+* Increase test coverage on the CLI application side
+* Comment the code and add documentation
+* Add test to build pipeline
+* Refactor Config constants
+* Add feature list
+* List/document differences from xkpasswd.net
+  * `mempass` is fully comptabile with xkpasswd.net generated configurations but `mempass` has a few extra options and properties it supports
+  * Make JSON Schema for custom configuration files
+  * Show examples of custom configuration capabilities
+* Add Sentence Case as a `case_transform` option
