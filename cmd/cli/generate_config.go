@@ -50,6 +50,7 @@ func getFlagData(cmd *cobra.Command) (map[string]any, error) {
 			return
 		}
 	})
+
 	return flagData, nil
 }
 
@@ -60,15 +61,17 @@ func isFlagSet(cmd *cobra.Command, flagKey string) bool {
 			flagSet = true
 		}
 	})
+
 	return flagSet
 }
 
-func CheckPresetFlag(cmd *cobra.Command) (string, bool, error) {
+func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
 	presetArgPresent := isFlagSet(cmd, config.PresetKey)
 	presetFlag, err := cmd.Flags().GetString(config.PresetKey)
 	if presetArgPresent && (err != nil || presetFlag == "") {
 		return "", false, fmt.Errorf("invalid %s flag: %w", config.PresetKey, err)
 	}
+
 	return presetFlag, presetArgPresent, nil
 }
 
@@ -80,6 +83,7 @@ func loadCustomConfig(path string) (string, error) {
 	if path == "" {
 		return "", nil
 	}
+
 	return asset.LoadJSONFile(path)
 }
 
@@ -87,18 +91,21 @@ func getPresetFromCustomConfig(customCfgJSON string) (string, error) {
 	if customCfgJSON == "" {
 		return "", nil
 	}
+
 	var customCfg map[string]any
 	if err := json.Unmarshal([]byte(customCfgJSON), &customCfg); err != nil {
 		return "", fmt.Errorf("json unmarshal error for custom config: %w", err)
 	}
+
 	if preset, ok := customCfg[config.PresetKey].(string); ok {
 		return preset, nil
 	}
+
 	return "", nil
 }
 
 func getBaseJSONPreset(cmd *cobra.Command) (string, error) {
-	presetFlag, presetArgPresent, err := CheckPresetFlag(cmd)
+	presetFlag, presetArgPresent, err := checkPresetFlag(cmd)
 	if err != nil {
 		return "", err
 	}
@@ -140,6 +147,7 @@ func mergeCustomConfig(cfgJSON, path string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to load JSON file from path %s: %w", path, err)
 	}
+
 	return json_merge.Merge(cfgJSON, customCfgJSON)
 }
 

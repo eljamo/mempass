@@ -67,9 +67,9 @@ func (s *DefaultSeparatorService) validate() error {
 			return errors.New("separator_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.CheckStringLengths(sa)
-		if !chk {
-			return errors.New("symbol_alphabet cannot contain elements with length greater than 1")
+		chk := stringcheck.LengthGreaterThanOne(sa)
+		if chk {
+			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
 		}
 	}
 

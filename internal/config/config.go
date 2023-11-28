@@ -44,6 +44,7 @@ const (
 	Invert                   = "INVERT" // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net generated configs
 	Lower                    = "LOWER"
 	LowerVowelUpperConsonant = "LOWER_VOWEL_UPPER_CONSONANT"
+	Sentence                 = "SENTENCE"
 	Upper                    = "UPPER"
 )
 
@@ -53,7 +54,8 @@ const (
 )
 
 var Preset = []string{
-	Default, AppleID, NTLM, SecurityQ, Web16, Web16XKPasswd, Web32, WiFi, XKCD, XKCDXKPasswd,
+	Default, AppleID, NTLM, SecurityQ, Web16, Web16XKPasswd, Web32, WiFi, XKCD,
+	XKCDXKPasswd,
 }
 
 var DefaultSpecialCharacters = []string{
@@ -62,12 +64,16 @@ var DefaultSpecialCharacters = []string{
 
 var PaddingType = []string{Adaptive, Fixed, None}
 
-var TransformType = []string{Alternate, AlternateLettercase, Capitalise, CapitaliseInvert, Invert, Lower, LowerVowelUpperConsonant, None, Random, Upper}
+var TransformType = []string{
+	Alternate, AlternateLettercase, Capitalise, CapitaliseInvert, Invert, Lower,
+	LowerVowelUpperConsonant, None, Random, Sentence, Upper,
+}
 
 var PaddingCharacterAndSeparatorCharacter = append([]string{Random}, DefaultSpecialCharacters...)
 
 var WordLists = []string{
-	All, DoctorWho, EN, ENSmall, GameOfThrones, HarryPotter, MiddleEarth, StarTrek, StarWars,
+	All, DoctorWho, EN, ENSmall, GameOfThrones, HarryPotter, MiddleEarth,
+	StarTrek, StarWars,
 }
 
 type Config struct {

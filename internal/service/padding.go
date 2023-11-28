@@ -159,9 +159,9 @@ func (s *DefaultPaddingService) validate() error {
 			return errors.New("symbol_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.CheckStringLengths(sa)
-		if chk == false {
-			return errors.New("symbol_alphabet cannot contain elements with length greater than 1")
+		chk := stringcheck.LengthGreaterThanOne(sa)
+		if chk {
+			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
 		}
 	}
 

@@ -48,6 +48,8 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 		return lowerVowelUpperConsonant(slice)
 	case config.Random:
 		return s.random(slice)
+	case config.Sentence:
+		return s.sentence(slice), nil
 	case config.Upper:
 		return s.upper(slice), nil
 	case config.None:
@@ -57,6 +59,8 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 
 	return slice, nil
 }
+
+var caser = cases.Title(language.English)
 
 func (s *DefaultTransformerService) alternate(slice []string) []string {
 	for i, w := range slice {
@@ -97,9 +101,8 @@ func alternateLettercase(slice []string) ([]string, error) {
 }
 
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
-	caser := cases.Title(language.English)
-	for i := range slice {
-		slice[i] = caser.String(slice[i])
+	for i, w := range slice {
+		slice[i] = caser.String(w)
 	}
 
 	return slice
@@ -175,6 +178,18 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 	}
 
 	return slice, nil
+}
+
+func (s *DefaultTransformerService) sentence(slice []string) []string {
+	for i, w := range slice {
+		if i == 0 {
+			slice[i] = caser.String(w)
+		} else {
+			slice[i] = strings.ToLower(w)
+		}
+	}
+
+	return slice
 }
 
 func (s *DefaultTransformerService) validate() error {
