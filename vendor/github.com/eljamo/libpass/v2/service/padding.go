@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/eljamo/mempass/internal/config"
-	stringcheck "github.com/eljamo/mempass/internal/string_check"
+	"github.com/eljamo/libpass/v2/config"
+	"github.com/eljamo/libpass/v2/internal/stringcheck"
 )
 
 type PaddingService interface {
@@ -159,7 +159,7 @@ func (s *DefaultPaddingService) validate() error {
 			return errors.New("symbol_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.LengthGreaterThanOne(sa)
+		chk := stringcheck.HasElementWithLengthGreaterThanOne(sa)
 		if chk {
 			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
 		}

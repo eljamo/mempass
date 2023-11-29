@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eljamo/mempass/asset"
-	"github.com/eljamo/mempass/internal/config"
+	"github.com/eljamo/libpass/v2/asset"
+	"github.com/eljamo/libpass/v2/config"
 )
 
 type WordListService interface {

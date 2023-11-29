@@ -1,6 +1,6 @@
 # mempass
 
-A memorable password generator, a CLI version of xkpasswd.net written in Go
+A memorable password generator, a CLI version of xkpasswd.net written in Go. This tool uses [libpass](https://github.com/eljamo/libpass) to generate passwords
 
 ## Install
 
@@ -131,21 +131,3 @@ __43:RATIOS:jobs:baghdad:37__
 ;;87=struggle=rich=think=08;;
 ..25~ESCORTS~scene~NOTICED~62..
 ```
-
-### To-do list
-
-* Make word lists for
-  * Ancient History & Mythology
-  * Bloodborne, Dark Souls, Demon's Souls, Elden Ring and Sekiro
-  * Dungeons & Dragons
-  * Warhammer
-* Increase test coverage on the CLI application side
-* Comment the code and add documentation
-* Add test to build pipeline
-* Refactor Config constants
-* Add feature list
-* List/document differences from xkpasswd.net
-  * `mempass` is fully comptabile with xkpasswd.net generated configurations but `mempass` has a few extra options and properties it supports
-  * Make JSON Schema for custom configuration files
-  * Show examples of custom configuration capabilities
-* Add Sentence Case as a `case_transform` option

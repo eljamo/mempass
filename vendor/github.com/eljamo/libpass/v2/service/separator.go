@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"github.com/eljamo/mempass/internal/config"
-	stringcheck "github.com/eljamo/mempass/internal/string_check"
+	"github.com/eljamo/libpass/v2/config"
+	"github.com/eljamo/libpass/v2/internal/stringcheck"
 )
 
 type SeparatorService interface {
@@ -67,9 +67,9 @@ func (s *DefaultSeparatorService) validate() error {
 			return errors.New("separator_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.LengthGreaterThanOne(sa)
+		chk := stringcheck.HasElementWithLengthGreaterThanOne(sa)
 		if chk {
-			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
+			return errors.New("separator_alphabet cannot contain elements with a length greater than 1")
 		}
 	}
 

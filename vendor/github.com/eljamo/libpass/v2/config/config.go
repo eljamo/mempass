@@ -77,23 +77,23 @@ var WordLists = []string{
 }
 
 type Config struct {
-	CaseTransform           string   `json:"case_transform,omitempty"`
-	NumPasswords            int      `json:"num_passwords,omitempty"`
-	NumWords                int      `json:"num_words,omitempty"`
-	PaddingCharactersAfter  int      `json:"padding_characters_after,omitempty"`
-	PaddingCharactersBefore int      `json:"padding_characters_before,omitempty"`
-	PaddingCharacter        string   `json:"padding_character,omitempty"`
-	PaddingDigitsAfter      int      `json:"padding_digits_after,omitempty"`
-	PaddingDigitsBefore     int      `json:"padding_digits_before,omitempty"`
-	PaddingType             string   `json:"padding_type,omitempty"`
-	PadToLength             int      `json:"pad_to_length,omitempty"`
-	Preset                  string   `json:"preset,omitempty"`
-	SeparatorAlphabet       []string `json:"separator_alphabet,omitempty"`
-	SeparatorCharacter      string   `json:"separator_character,omitempty"`
-	SymbolAlphabet          []string `json:"symbol_alphabet,omitempty"`
-	WordLengthMax           int      `json:"word_length_max,omitempty"`
-	WordLengthMin           int      `json:"word_length_min,omitempty"`
-	WordList                string   `json:"word_list,omitempty"`
+	CaseTransform           string   `key:"case_transform" json:"case_transform,omitempty"`
+	NumPasswords            int      `key:"num_passwords" json:"num_passwords,omitempty"`
+	NumWords                int      `key:"num_words" json:"num_words,omitempty"`
+	PaddingCharactersAfter  int      `key:"padding_characters_after" json:"padding_characters_after,omitempty"`
+	PaddingCharactersBefore int      `key:"padding_characters_before" json:"padding_characters_before,omitempty"`
+	PaddingCharacter        string   `key:"padding_character" json:"padding_character,omitempty"`
+	PaddingDigitsAfter      int      `key:"padding_digits_after" json:"padding_digits_after,omitempty"`
+	PaddingDigitsBefore     int      `key:"padding_digits_before" json:"padding_digits_before,omitempty"`
+	PaddingType             string   `key:"padding_type" json:"padding_type,omitempty"`
+	PadToLength             int      `key:"pad_to_length" json:"pad_to_length,omitempty"`
+	Preset                  string   `key:"preset" json:"preset,omitempty"`
+	SeparatorAlphabet       []string `key:"separator_alphabet" json:"separator_alphabet,omitempty"`
+	SeparatorCharacter      string   `key:"separator_character" json:"separator_character,omitempty"`
+	SymbolAlphabet          []string `key:"symbol_alphabet" json:"symbol_alphabet,omitempty"`
+	WordLengthMax           int      `key:"word_length_max" json:"word_length_max,omitempty"`
+	WordLengthMin           int      `key:"word_length_min" json:"word_length_min,omitempty"`
+	WordList                string   `key:"word_list" json:"word_list,omitempty"`
 }
 
 var WordListDescriptionMap = map[string]string{

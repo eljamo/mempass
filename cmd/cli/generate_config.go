@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/eljamo/mempass/asset"
-	"github.com/eljamo/mempass/internal/config"
+	"github.com/eljamo/libpass/v2/asset"
+	"github.com/eljamo/libpass/v2/config"
 	"github.com/eljamo/mempass/internal/json_merge"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
