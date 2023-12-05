@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 
-	"github.com/eljamo/libpass/v2/config"
-	"github.com/eljamo/libpass/v2/internal/stringcheck"
+	"github.com/eljamo/libpass/v3/config"
+	"github.com/eljamo/libpass/v3/internal/stringcheck"
 )
 
 type SeparatorService interface {

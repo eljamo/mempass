@@ -3,10 +3,9 @@ package service
 import (
 	"errors"
 	"fmt"
-	"strings"
 
-	"github.com/eljamo/libpass/v2/asset"
-	"github.com/eljamo/libpass/v2/config"
+	"github.com/eljamo/libpass/v3/asset"
+	"github.com/eljamo/libpass/v3/config"
 )
 
 type WordListService interface {
@@ -46,10 +45,8 @@ func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([]strin
 		return nil, err
 	}
 
-	aw := strings.Split(string(wl), "\n")
 	var fw []string
-
-	for _, word := range aw {
+	for _, word := range wl {
 		if len(word) >= wordMinLength && len(word) <= wordMaxLength {
 			fw = append(fw, string(word))
 		}

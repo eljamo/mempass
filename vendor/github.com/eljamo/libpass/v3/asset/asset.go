@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eljamo/libpass/v2/config"
+	"github.com/eljamo/libpass/v3/config"
 )
 
 //go:embed preset/* word_list/*
@@ -68,7 +68,7 @@ func LoadJSONFile(filePath string) (string, error) {
 	return loadFileData(filePath, os.ReadFile)
 }
 
-func GetWordList(key string) ([]byte, error) {
+func GetWordList(key string) ([]string, error) {
 	fileName, ok := keyToFile(key, config.WordListKey)
 	if !ok {
 		return nil, fmt.Errorf("invalid word list key '%s'", key)
@@ -80,7 +80,7 @@ func GetWordList(key string) ([]byte, error) {
 		return nil, fmt.Errorf("failed to read embedded text file '%s': %w", filePath, err)
 	}
 
-	return data, nil
+	return strings.Split(string(data), "\n"), nil
 }
 
 func GetJSONPreset(key string) (string, error) {

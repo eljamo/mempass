@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/eljamo/libpass/v2/config"
+	"github.com/eljamo/libpass/v3/config"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
