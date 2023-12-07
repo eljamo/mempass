@@ -11,8 +11,6 @@ import (
 	"golang.org/x/text/language"
 )
 
-var caser = cases.Title(language.English)
-
 // Defines an interface for transforming a slice of strings
 type TransformerService interface {
 	// Transform takes a slice of strings and transforms each element or returns
@@ -20,7 +18,7 @@ type TransformerService interface {
 	Transform(slice []string) ([]string, error)
 }
 
-// Implementats the TransformerService, providing functionality to transform
+// Implements the TransformerService, providing functionality to transform
 // string slices based on a predefined configuration.
 type DefaultTransformerService struct {
 	cfg    *config.Config
@@ -136,6 +134,7 @@ func alternateLettercase(slice []string) ([]string, error) {
 //
 // Example Output: string[]{"Hello", "World"}
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
+	caser := cases.Title(language.English)
 	for i, w := range slice {
 		slice[i] = caser.String(w)
 	}
@@ -230,6 +229,7 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 //
 // Example Output: string[]{"Hello", "world"}
 func (s *DefaultTransformerService) sentence(slice []string) []string {
+	caser := cases.Title(language.English)
 	for i, w := range slice {
 		if i == 0 {
 			slice[i] = caser.String(w)
