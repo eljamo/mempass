@@ -6,19 +6,28 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/eljamo/libpass/v3/config"
-	"github.com/eljamo/libpass/v3/internal/stringcheck"
+	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v4/internal/stringcheck"
 )
 
+// Defines the interface for a service that provides functionality to pad a
+// slice of strings.
 type PaddingService interface {
+	// Takes a slice of strings and applies extra characters or digits
+	// and joins the slice, or returns an error
 	Pad(slice []string) (string, error)
 }
 
+// Implements the PaddingService interface. It provides methods to add padding
+// to strings based on predefined configuration settings.
 type DefaultPaddingService struct {
 	cfg    *config.Config
 	rngSvc RNGService
 }
 
+// Creates a new instance of DefaultPaddingService with the provided
+// configuration and RNGService. It returns an error if the provided
+// configuration is invalid.
 func NewPaddingService(cfg *config.Config, rngSvc RNGService) (*DefaultPaddingService, error) {
 	svc := &DefaultPaddingService{cfg, rngSvc}
 
@@ -29,13 +38,18 @@ func NewPaddingService(cfg *config.Config, rngSvc RNGService) (*DefaultPaddingSe
 	return svc, nil
 }
 
+// Takes a slice of strings and applies padding based on the service's
+// configuration. It returns the padded string or an error if padding cannot
+// be applied.
 func (s *DefaultPaddingService) Pad(slice []string) (string, error) {
 	pwd, err := s.digits(slice)
 	if err != nil {
 		return "", err
 	}
 
+	// Remove any separator characters which remain on the edges of the slice
 	pwe := s.removeEdgeSeparatorCharacter(pwd)
+	// Remove any whitespace characters which remain on the edges of the slice
 	pwt := strings.TrimSpace(strings.Join(pwe, ""))
 
 	pws, err := s.symbols(pwt)
@@ -46,6 +60,9 @@ func (s *DefaultPaddingService) Pad(slice []string) (string, error) {
 	return pws, nil
 }
 
+// Adds random digits before and after the given slice based on the
+// configuration. It returns a slice with the added digits or an error if the
+// digits cannot be generated.
 func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 	before, after := s.cfg.PaddingDigitsBefore, s.cfg.PaddingDigitsAfter
 	paddedSlice := make([]string, 0, before+len(slice)+after)
@@ -68,10 +85,12 @@ func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 	return paddedSlice, nil
 }
 
-func (s *DefaultPaddingService) generateRandomDigits(count int) ([]string, error) {
-	digits := make([]string, 0, count)
-	for i := 0; i < count; i++ {
-		num, err := s.rngSvc.GenerateWithMax(maxDigit)
+// Generates a specified number of random digits. It returns a slice of the
+// generated digits as strings or an error if the generation fails.
+func (s *DefaultPaddingService) generateRandomDigits(num int) ([]string, error) {
+	digits := make([]string, 0, num)
+	for i := 0; i < num; i++ {
+		num, err := s.rngSvc.GenerateDigit()
 		if err != nil {
 			return nil, err
 		}
@@ -82,22 +101,55 @@ func (s *DefaultPaddingService) generateRandomDigits(count int) ([]string, error
 	return digits, nil
 }
 
+// Removes separator characters from the edges of the given slice. It handles
+// both specified and random separator characters based on the configuration.
 func (s *DefaultPaddingService) removeEdgeSeparatorCharacter(slice []string) []string {
 	if len(slice) == 0 {
 		return slice
 	}
 
+	sc := s.cfg.SeparatorCharacter
+	if sc == config.Random {
+		return s.removeRandomEdgeSeparatorCharacter(slice)
+	}
+
 	start, end := 0, len(slice)
-	if slice[start] == s.cfg.SeparatorCharacter {
+	if slice[start] == sc {
 		start++
 	}
-	if end > start && slice[end-1] == s.cfg.SeparatorCharacter {
+	if end > start && slice[end-1] == sc {
 		end--
 	}
 
 	return slice[start:end]
 }
 
+// Specifically handles the removal of random edge separator characters. It is
+// used when the separator character is set to random in the configuration.
+func (s *DefaultPaddingService) removeRandomEdgeSeparatorCharacter(slice []string) []string {
+	if len(slice) == 0 {
+		return slice
+	}
+
+	sa := s.cfg.SeparatorAlphabet
+	if len(sa) == 0 {
+		return slice
+	}
+
+	start, end := 0, len(slice)
+	if stringcheck.IsElementInSlice(sa, slice[start]) {
+		start++
+	}
+	if end > start && stringcheck.IsElementInSlice(sa, slice[end-1]) {
+		end--
+	}
+
+	return slice[start:end]
+}
+
+// Applies symbol-based padding to the provided string as per the service
+// configuration. It handles different padding types (fixed, adaptive) and
+// returns the padded string or an error.
 func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	char, err := s.getPaddingCharacter()
 	if err != nil {
@@ -108,7 +160,7 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	case config.Fixed:
 		return s.fixed(pw, char)
 	case config.Adaptive:
-		return s.adaptive(pw, char)
+		return s.adaptive(pw, char), nil
 	case config.None:
 		return pw, nil
 	}
@@ -116,6 +168,8 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	return pw, nil
 }
 
+// Retrieves the character to be used for padding. It selects a random character
+// from the symbol alphabet if the padding character is set to random.
 func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
 	if s.cfg.PaddingCharacter == config.Random {
 		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SymbolAlphabet))
@@ -128,6 +182,8 @@ func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
 	return s.cfg.PaddingCharacter, nil
 }
 
+// Applies a fixed number of padding characters before and after the input
+// string. It returns the resulting string with the specified fixed padding.
 func (s *DefaultPaddingService) fixed(pw string, char string) (string, error) {
 	paddingBefore := strings.Repeat(char, s.cfg.PaddingCharactersBefore)
 	paddingAfter := strings.Repeat(char, s.cfg.PaddingCharactersAfter)
@@ -135,19 +191,24 @@ func (s *DefaultPaddingService) fixed(pw string, char string) (string, error) {
 	return paddingBefore + pw + paddingAfter, nil
 }
 
-func (s *DefaultPaddingService) adaptive(pw string, char string) (string, error) {
+// Applies padding to the input string to meet a specified total length.
+// The padding is added at the end of the string and uses the provided
+// padding character.
+func (s *DefaultPaddingService) adaptive(pw string, char string) string {
 	padLen := s.cfg.PadToLength
 	pwLen := utf8.RuneCountInString(pw)
 	if padLen <= pwLen {
-		return pw, nil
+		return pw
 	}
 
 	diff := padLen - pwLen
 	padding := strings.Repeat(char, diff)
 
-	return pw + padding, nil
+	return pw + padding
 }
 
+// Checks the service's configuration for any invalid values. It ensures the
+// integrity of the padding settings before processing the padding operations.
 func (s *DefaultPaddingService) validate() error {
 	if s.cfg.PaddingType != config.None && s.cfg.PaddingCharacter != config.Random && len(s.cfg.PaddingCharacter) > 1 {
 		return errors.New("padding_character must be a single character if specified")

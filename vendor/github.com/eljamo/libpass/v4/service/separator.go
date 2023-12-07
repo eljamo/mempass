@@ -3,19 +3,28 @@ package service
 import (
 	"errors"
 
-	"github.com/eljamo/libpass/v3/config"
-	"github.com/eljamo/libpass/v3/internal/stringcheck"
+	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v4/internal/stringcheck"
 )
 
+// Defines the interface for a service that can separate elements of a string
+// slice.
 type SeparatorService interface {
+	// Separate takes a slice of strings and inserts a separator character
+	// between each element of the slice or returns an error if the slice
+	// cannot be separated
 	Separate(slice []string) ([]string, error)
 }
 
+// Implements the SeparatorService, providing functionality to separate string
+// slices.
 type DefaultSeparatorService struct {
 	cfg    *config.Config
 	rngSvc RNGService
 }
 
+// Creates a new instance of DefaultSeparatorService. It validates the provided
+// configuration and returns an error if the configuration is invalid.
 func NewSeparatorService(cfg *config.Config, rngSvc RNGService) (*DefaultSeparatorService, error) {
 	svc := &DefaultSeparatorService{cfg, rngSvc}
 
@@ -26,6 +35,10 @@ func NewSeparatorService(cfg *config.Config, rngSvc RNGService) (*DefaultSeparat
 	return svc, nil
 }
 
+// Separate takes a slice of strings and inserts a separator character between
+// each element of the slice. The separator character is determined based on the
+// configuration. It returns the modified slice or an error if the separator
+// character cannot be determined.
 func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 	char, err := s.getSeparatorCharacter()
 	if err != nil {
@@ -41,6 +54,9 @@ func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 	return separatedSlice, nil
 }
 
+// Returns the separator character based on the service configuration. It either
+// returns a predefined character or a random character from a specified
+// alphabet. Returns an error if it fails to return a random character.
 func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
 	if s.cfg.SeparatorCharacter == config.Random {
 		sa := s.cfg.SeparatorAlphabet
@@ -56,6 +72,10 @@ func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
 	return s.cfg.SeparatorCharacter, nil
 }
 
+// Checks the configuration of the DefaultSeparatorService for  correctness.
+// It ensures that the separator character is either a single  character or a
+// valid random character from the alphabet. Returns an error if the
+// configuration is invalid.
 func (s *DefaultSeparatorService) validate() error {
 	if s.cfg.SeparatorCharacter != config.Random && len(s.cfg.SeparatorCharacter) > 1 {
 		return errors.New("separator_character must be a single character if specified")

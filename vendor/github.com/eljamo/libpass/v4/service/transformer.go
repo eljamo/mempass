@@ -6,20 +6,29 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/eljamo/libpass/v3/config"
+	"github.com/eljamo/libpass/v4/config"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
+var caser = cases.Title(language.English)
+
+// Defines an interface for transforming a slice of strings
 type TransformerService interface {
+	// Transform takes a slice of strings and transforms each element or returns
+	// an error if the transformation fails.
 	Transform(slice []string) ([]string, error)
 }
 
+// Implementats the TransformerService, providing functionality to transform
+// string slices based on a predefined configuration.
 type DefaultTransformerService struct {
 	cfg    *config.Config
 	rngSvc RNGService
 }
 
+// Creates a new valid instance of DefaultTransformerService with the given
+// configuration and RNG service
 func NewTransformerService(cfg *config.Config, rngSvc RNGService) (*DefaultTransformerService, error) {
 	svc := &DefaultTransformerService{cfg, rngSvc}
 
@@ -30,6 +39,21 @@ func NewTransformerService(cfg *config.Config, rngSvc RNGService) (*DefaultTrans
 	return svc, nil
 }
 
+// Transform takes a slice of strings and transforms each element
+// according to the configured transformation rule.
+// Returns the transformed slice or an error if the transformation fails.
+//
+// Transform Types:
+//   - Alternate
+//   - AlternateLettercase
+//   - Capitalise
+//   - CapitaliseInvert
+//   - Invert
+//   - Lower
+//   - LowerVowelUpperConsonant
+//   - Random
+//   - Sentence
+//   - Upper
 func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) {
 	switch s.cfg.CaseTransform {
 	case config.Alternate:
@@ -60,8 +84,9 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 	return slice, nil
 }
 
-var caser = cases.Title(language.English)
-
+// alternate applies alternating casing to each element of the slice.
+//
+// Example Output: string[]{"hello", "WORLD"}
 func (s *DefaultTransformerService) alternate(slice []string) []string {
 	for i, w := range slice {
 		if i%2 == 0 {
@@ -74,6 +99,13 @@ func (s *DefaultTransformerService) alternate(slice []string) []string {
 	return slice
 }
 
+// alternateLettercase takes a slice of strings and alternates the casing of
+// each letter within each string. Starting with lowercase, it switches
+// between lowercase and uppercase for each subsequent letter.
+// The function returns a new slice of strings with the applied transformations
+// or an error if an issue occurs during string building.
+//
+// Example Output: string[]{"hElLo", "WoRlD"}, nil
 func alternateLettercase(slice []string) ([]string, error) {
 	var result []string
 	for _, str := range slice {
@@ -100,6 +132,9 @@ func alternateLettercase(slice []string) ([]string, error) {
 	return result, nil
 }
 
+// Capitialises each element in the slice
+//
+// Example Output: string[]{"Hello", "World"}
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
 	for i, w := range slice {
 		slice[i] = caser.String(w)
@@ -108,6 +143,9 @@ func (s *DefaultTransformerService) capitalise(slice []string) []string {
 	return slice
 }
 
+// Inverts the casing of a capitialised string in the slice
+//
+// Exmaple output: string[]{"hELLO", "wORLD"}, nil
 func (s *DefaultTransformerService) capitaliseInvert(slice []string) ([]string, error) {
 	for i, w := range slice {
 		var sb strings.Builder
@@ -141,6 +179,14 @@ func isVowel(r rune) bool {
 	return strings.ContainsRune("aeiouAEIOU", r)
 }
 
+// lowerVowelUpperConsonant processes a slice of strings, transforming each string
+// by applying lowercase to vowels and uppercase to consonants.
+// It iterates through each rune in a string, checks if it is a vowel using
+// the isVowel function, and accordingly changes its case.
+// The function returns the transformed slice of strings or an error if any
+// occurs during the string building process.
+//
+// Example Output: string[]{"hEllO", "wOrld"}, nil
 func lowerVowelUpperConsonant(slice []string) ([]string, error) {
 	var result []string
 	for _, str := range slice {
@@ -180,6 +226,9 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 	return slice, nil
 }
 
+// sentence applies sentence casing across each element of the slice
+//
+// Example Output: string[]{"Hello", "world"}
 func (s *DefaultTransformerService) sentence(slice []string) []string {
 	for i, w := range slice {
 		if i == 0 {
