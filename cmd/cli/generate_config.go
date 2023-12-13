@@ -1,57 +1,148 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/eljamo/libpass/v4/asset"
-	"github.com/eljamo/libpass/v4/config"
-	"github.com/eljamo/mempass/internal/json_merge"
+	"github.com/eljamo/libpass/v5/asset"
+	"github.com/eljamo/libpass/v5/config"
+	"github.com/eljamo/libpass/v5/config/option"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
 const CustomConfigKeyPath = "custom_config_path"
 
-func mergeConfigs(cmd *cobra.Command) (string, error) {
-	baseCfg, err := getBaseJSONPreset(cmd)
+func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
+	baseCfg, customCfg, err := loadJSONFiles(cmd)
 	if err != nil {
-		return "", fmt.Errorf("getBaseJSONPreset error: %w", err)
+		return nil, fmt.Errorf("loadJSONFiles error: %w", err)
 	}
 
-	flagData, err := getFlagData(cmd)
+	flagCfg, err := getCmdFlagsAsJSON(cmd)
 	if err != nil {
-		return "", fmt.Errorf("getFlagData error: %w", err)
+		return nil, fmt.Errorf("getCmdFlags error: %w", err)
 	}
 
-	flagCfg, err := json.Marshal(flagData)
-	if err != nil {
-		return "", fmt.Errorf("json marshal error: %w", err)
-	}
-
-	return json_merge.Merge(baseCfg, string(flagCfg))
+	return config.Generate(baseCfg, customCfg, flagCfg)
 }
 
-func getFlagData(cmd *cobra.Command) (map[string]any, error) {
-	flagData := make(map[string]any)
+// loadJSONFiles loads the base config and the custom config from the JSON files
+func loadJSONFiles(cmd *cobra.Command) (map[string]any, map[string]any, error) {
+	customCfg, err := getCustomConfigJSON(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	presetValue, err := getPresetValue(cmd, customCfg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	baseCfg, err := asset.GetJSONPreset(presetValue)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return baseCfg, customCfg, nil
+}
+
+func getCustomConfigJSON(cmd *cobra.Command) (map[string]any, error) {
+	path, err := getCustomConfigPath(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	customCfgJSON, err := loadCustomConfig(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return customCfgJSON, nil
+}
+
+func getCmdFlagsAsJSON(cmd *cobra.Command) (map[string]any, error) {
+	flags := make(map[string]any)
+
+	var err error
 	cmd.Flags().Visit(func(flag *pflag.Flag) {
-		var err error
-		switch flag.Value.Type() {
-		case "string":
-			flagData[flag.Name], err = cmd.Flags().GetString(flag.Name)
-		case "int":
-			flagData[flag.Name], err = cmd.Flags().GetInt(flag.Name)
-		case "bool":
-			flagData[flag.Name], err = cmd.Flags().GetBool(flag.Name)
-		case "stringSlice":
-			flagData[flag.Name], err = cmd.Flags().GetStringSlice(flag.Name)
-		}
 		if err != nil {
 			return
 		}
+
+		var flagErr error
+		switch flag.Value.Type() {
+		case "string":
+			flags[flag.Name], flagErr = cmd.Flags().GetString(flag.Name)
+		case "int":
+			flags[flag.Name], flagErr = cmd.Flags().GetInt(flag.Name)
+		case "bool":
+			flags[flag.Name], flagErr = cmd.Flags().GetBool(flag.Name)
+		case "stringSlice":
+			flags[flag.Name], flagErr = cmd.Flags().GetStringSlice(flag.Name)
+		}
+
+		if flagErr != nil {
+			err = flagErr
+		}
 	})
 
-	return flagData, nil
+	if err != nil {
+		return nil, fmt.Errorf("getCmdFlagsAsJSON error: %w", err)
+	}
+
+	return flags, nil
+}
+
+func getCustomConfigPath(cmd *cobra.Command) (string, error) {
+	return cmd.Flags().GetString(CustomConfigKeyPath)
+}
+
+func loadCustomConfig(path string) (map[string]any, error) {
+	if path == "" {
+		return nil, nil
+	}
+
+	return asset.LoadJSONFile(path)
+}
+
+func getPresetFromCustomConfig(customCfgJSON map[string]any) string {
+	if customCfgJSON == nil {
+		return ""
+	}
+
+	if preset, ok := customCfgJSON[option.PresetKey].(string); ok {
+		return preset
+	}
+
+	return ""
+}
+
+func getPresetValue(cmd *cobra.Command, customJSONCfg map[string]any) (string, error) {
+	var presetValue string
+	presetFlag, presetArgPresent, err := checkPresetFlag(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	presetFromCustomCfg := getPresetFromCustomConfig(customJSONCfg)
+
+	if !presetArgPresent && presetFromCustomCfg != "" {
+		presetValue = presetFromCustomCfg
+	} else {
+		presetValue = presetFlag
+	}
+
+	return presetValue, nil
+}
+
+func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
+	presetArgPresent := isFlagSet(cmd, option.PresetKey)
+	presetFlag, err := cmd.Flags().GetString(option.PresetKey)
+	if presetArgPresent && (err != nil || presetFlag == "") {
+		return "", false, fmt.Errorf("invalid %s flag: %w", option.PresetKey, err)
+	}
+
+	return presetFlag, presetArgPresent, nil
 }
 
 func isFlagSet(cmd *cobra.Command, flagKey string) bool {
@@ -63,104 +154,4 @@ func isFlagSet(cmd *cobra.Command, flagKey string) bool {
 	})
 
 	return flagSet
-}
-
-func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
-	presetArgPresent := isFlagSet(cmd, config.PresetKey)
-	presetFlag, err := cmd.Flags().GetString(config.PresetKey)
-	if presetArgPresent && (err != nil || presetFlag == "") {
-		return "", false, fmt.Errorf("invalid %s flag: %w", config.PresetKey, err)
-	}
-
-	return presetFlag, presetArgPresent, nil
-}
-
-func getCustomConfigPath(cmd *cobra.Command) (string, error) {
-	return cmd.Flags().GetString(CustomConfigKeyPath)
-}
-
-func loadCustomConfig(path string) (string, error) {
-	if path == "" {
-		return "", nil
-	}
-
-	return asset.LoadJSONFile(path)
-}
-
-func getPresetFromCustomConfig(customCfgJSON string) (string, error) {
-	if customCfgJSON == "" {
-		return "", nil
-	}
-
-	var customCfg map[string]any
-	if err := json.Unmarshal([]byte(customCfgJSON), &customCfg); err != nil {
-		return "", fmt.Errorf("json unmarshal error for custom config: %w", err)
-	}
-
-	if preset, ok := customCfg[config.PresetKey].(string); ok {
-		return preset, nil
-	}
-
-	return "", nil
-}
-
-func getBaseJSONPreset(cmd *cobra.Command) (string, error) {
-	presetFlag, presetArgPresent, err := checkPresetFlag(cmd)
-	if err != nil {
-		return "", err
-	}
-
-	path, err := getCustomConfigPath(cmd)
-	if err != nil {
-		return "", err
-	}
-
-	customCfgJSON, err := loadCustomConfig(path)
-	if err != nil {
-		return "", err
-	}
-
-	presetFromCustomCfg, err := getPresetFromCustomConfig(customCfgJSON)
-	if err != nil {
-		return "", err
-	}
-
-	cfgName := presetFlag
-	if !presetArgPresent && presetFromCustomCfg != "" {
-		cfgName = presetFromCustomCfg
-	}
-
-	cfgJSON, err := asset.GetJSONPreset(cfgName)
-	if err != nil {
-		return "", fmt.Errorf("failed to get JSON config: %w", err)
-	}
-
-	if path != "" && customCfgJSON != "" {
-		return json_merge.Merge(cfgJSON, customCfgJSON)
-	}
-
-	return cfgJSON, nil
-}
-
-func mergeCustomConfig(cfgJSON, path string) (string, error) {
-	customCfgJSON, err := asset.LoadJSONFile(path)
-	if err != nil {
-		return "", fmt.Errorf("failed to load JSON file from path %s: %w", path, err)
-	}
-
-	return json_merge.Merge(cfgJSON, customCfgJSON)
-}
-
-func generateConfig(cmd *cobra.Command, args []string) (*config.Config, error) {
-	cfgJSON, err := mergeConfigs(cmd)
-	if err != nil {
-		return nil, fmt.Errorf("mergeConfigs error: %w", err)
-	}
-
-	var cfg config.Config
-	if err := json.Unmarshal([]byte(cfgJSON), &cfg); err != nil {
-		return nil, fmt.Errorf("json unmarshal error: %w", err)
-	}
-
-	return &cfg, nil
 }

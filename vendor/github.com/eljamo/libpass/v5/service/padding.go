@@ -6,8 +6,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/eljamo/libpass/v4/config"
-	"github.com/eljamo/libpass/v4/internal/stringcheck"
+	"github.com/eljamo/libpass/v5/config"
+	"github.com/eljamo/libpass/v5/config/option"
+	"github.com/eljamo/libpass/v5/internal/validator"
 )
 
 // Defines the interface for a service that provides functionality to pad a
@@ -21,14 +22,14 @@ type PaddingService interface {
 // Implements the PaddingService interface. It provides methods to add padding
 // to strings based on predefined configuration settings.
 type DefaultPaddingService struct {
-	cfg    *config.Config
+	cfg    *config.Settings
 	rngSvc RNGService
 }
 
 // Creates a new instance of DefaultPaddingService with the provided
 // configuration and RNGService. It returns an error if the provided
 // configuration is invalid.
-func NewPaddingService(cfg *config.Config, rngSvc RNGService) (*DefaultPaddingService, error) {
+func NewPaddingService(cfg *config.Settings, rngSvc RNGService) (*DefaultPaddingService, error) {
 	svc := &DefaultPaddingService{cfg, rngSvc}
 
 	if err := svc.validate(); err != nil {
@@ -109,7 +110,7 @@ func (s *DefaultPaddingService) removeEdgeSeparatorCharacter(slice []string) []s
 	}
 
 	sc := s.cfg.SeparatorCharacter
-	if sc == config.Random {
+	if sc == option.Random {
 		return s.removeRandomEdgeSeparatorCharacter(slice)
 	}
 
@@ -137,10 +138,10 @@ func (s *DefaultPaddingService) removeRandomEdgeSeparatorCharacter(slice []strin
 	}
 
 	start, end := 0, len(slice)
-	if stringcheck.IsElementInSlice(sa, slice[start]) {
+	if validator.IsElementInSlice(sa, slice[start]) {
 		start++
 	}
-	if end > start && stringcheck.IsElementInSlice(sa, slice[end-1]) {
+	if end > start && validator.IsElementInSlice(sa, slice[end-1]) {
 		end--
 	}
 
@@ -157,11 +158,11 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	}
 
 	switch s.cfg.PaddingType {
-	case config.Fixed:
+	case option.Fixed:
 		return s.fixed(pw, char)
-	case config.Adaptive:
+	case option.Adaptive:
 		return s.adaptive(pw, char), nil
-	case config.None:
+	case option.None:
 		return pw, nil
 	}
 
@@ -171,7 +172,7 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 // Retrieves the character to be used for padding. It selects a random character
 // from the symbol alphabet if the padding character is set to random.
 func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
-	if s.cfg.PaddingCharacter == config.Random {
+	if s.cfg.PaddingCharacter == option.Random {
 		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SymbolAlphabet))
 		if err != nil {
 			return "", err
@@ -210,17 +211,17 @@ func (s *DefaultPaddingService) adaptive(pw string, char string) string {
 // Checks the service's configuration for any invalid values. It ensures the
 // integrity of the padding settings before processing the padding operations.
 func (s *DefaultPaddingService) validate() error {
-	if s.cfg.PaddingType != config.None && s.cfg.PaddingCharacter != config.Random && len(s.cfg.PaddingCharacter) > 1 {
+	if s.cfg.PaddingType != option.None && s.cfg.PaddingCharacter != option.Random && len(s.cfg.PaddingCharacter) > 1 {
 		return errors.New("padding_character must be a single character if specified")
 	}
 
-	if s.cfg.PaddingCharacter == config.Random {
+	if s.cfg.PaddingCharacter == option.Random {
 		sa := s.cfg.SymbolAlphabet
 		if len(sa) == 0 {
 			return errors.New("symbol_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.HasElementWithLengthGreaterThanOne(sa)
+		chk := validator.HasElementWithLengthGreaterThanOne(sa)
 		if chk {
 			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
 		}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v5/config"
 )
 
 // PasswordGeneratorService defines the interface for a service that generates
@@ -22,7 +22,7 @@ type PasswordGeneratorService interface {
 // combines various services like transformers, separators, padders, and word
 // list services to generate passwords based on provided configuration.
 type DefaultPasswordGeneratorService struct {
-	cfg            *config.Config
+	cfg            *config.Settings
 	transformerSvc TransformerService
 	separatorSvc   SeparatorService
 	paddingSvc     PaddingService
@@ -35,7 +35,7 @@ type DefaultPasswordGeneratorService struct {
 // error if the configuration is invalid (e.g., number of passwords
 // is less than 1).
 func NewCustomPasswordGeneratorService(
-	cfg *config.Config,
+	cfg *config.Settings,
 	transformerSvc TransformerService,
 	separatorSvc SeparatorService,
 	paddingSvc PaddingService,
@@ -59,7 +59,7 @@ func NewCustomPasswordGeneratorService(
 // implementations for its dependent services (transformer, separator, padding, and word list services).
 // It initializes each service with the provided configuration and random number generator service.
 func NewPasswordGeneratorService(
-	cfg *config.Config,
+	cfg *config.Settings,
 ) (*DefaultPasswordGeneratorService, error) {
 
 	rngs := NewRNGService()

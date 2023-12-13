@@ -10,6 +10,11 @@
     "padding_digits_after": 0,
     "padding_type": "FIXED",
     "padding_character": "RANDOM",
+    "separator_alphabet": [
+        ".",
+        "!",
+        "?"
+    ],
     "symbol_alphabet": [
         ".",
         "!",

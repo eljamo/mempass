@@ -9,35 +9,35 @@ import (
 	"path"
 	"strings"
 
-	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v5/config/option"
 )
 
 //go:embed preset/* word_list/*
 var files embed.FS
 var fileMap = map[string]map[string]string{
-	config.PresetKey: {
-		config.AppleID:       "appleid.json",
-		config.Default:       "default.json",
-		config.NTLM:          "ntlm.json",
-		config.SecurityQ:     "securityq.json",
-		config.Web16:         "web16.json",
-		config.Web16XKPasswd: "web16_xkpasswd.json",
-		config.Web32:         "web32.json",
-		config.WiFi:          "wifi.json",
-		config.XKCD:          "xkcd.json",
-		config.XKCDXKPasswd:  "xkcd_xkpasswd.json",
+	option.PresetKey: {
+		option.AppleID:       "appleid.json",
+		option.Default:       "default.json",
+		option.NTLM:          "ntlm.json",
+		option.SecurityQ:     "securityq.json",
+		option.Web16:         "web16.json",
+		option.Web16XKPasswd: "web16_xkpasswd.json",
+		option.Web32:         "web32.json",
+		option.WiFi:          "wifi.json",
+		option.XKCD:          "xkcd.json",
+		option.XKCDXKPasswd:  "xkcd_xkpasswd.json",
 	},
-	config.WordListKey: {
-		config.All:           "all.txt",
-		config.DoctorWho:     "doctor_who.txt",
-		config.EN:            "en.txt",
-		config.ENSmall:       "en_small.txt",
-		config.GameOfThrones: "game_of_thrones.txt",
-		config.HarryPotter:   "harry_potter.txt",
-		config.MiddleEarth:   "middle_earth.txt",
-		config.Pokemon:       "pokemon.txt",
-		config.StarTrek:      "star_trek.txt",
-		config.StarWars:      "star_wars.txt",
+	option.WordListKey: {
+		option.All:           "all.txt",
+		option.DoctorWho:     "doctor_who.txt",
+		option.EN:            "en.txt",
+		option.ENSmall:       "en_small.txt",
+		option.GameOfThrones: "game_of_thrones.txt",
+		option.HarryPotter:   "harry_potter.txt",
+		option.MiddleEarth:   "middle_earth.txt",
+		option.Pokemon:       "pokemon.txt",
+		option.StarTrek:      "star_trek.txt",
+		option.StarWars:      "star_wars.txt",
 	},
 }
 
@@ -47,39 +47,34 @@ func keyToFile(key, fileType string) (string, bool) {
 	return file, ok
 }
 
-func loadJSONFileData(filePath string, readerFunc func(string) ([]byte, error)) (string, error) {
+func loadJSONFileData(filePath string, readerFunc func(string) ([]byte, error)) (map[string]any, error) {
 	data, err := readerFunc(filePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to read file (%s): %w", filePath, err)
+		return nil, fmt.Errorf("failed to read file (%s): %w", filePath, err)
 	}
 
-	var parsed any
-	if err := json.Unmarshal(data, &parsed); err != nil {
-		return "", fmt.Errorf("invalid JSON content in (%s): %w", filePath, err)
+	var jmap map[string]any
+	if err := json.Unmarshal(data, &jmap); err != nil {
+		return nil, fmt.Errorf("invalid JSON content in (%s): %w", filePath, err)
 	}
 
-	jsonData, err := json.Marshal(parsed)
-	if err != nil {
-		return "", fmt.Errorf("marshaling JSON data for %s failed: %w", filePath, err)
-	}
-
-	return string(jsonData), nil
+	return jmap, nil
 }
 
 // LoadJSONFile reads a JSON file from the given file path and returns its
-// content as a string. It handles file reading and JSON unmarshalling. In case
-// of any error during these operations, an error is returned
-func LoadJSONFile(filePath string) (string, error) {
+// content as a map. In case of any error during these operations, an error
+// is returned
+func LoadJSONFile(filePath string) (map[string]any, error) {
 	return loadJSONFileData(filePath, os.ReadFile)
 }
 
 func getWordListFilePath(key string) (string, error) {
-	fileName, ok := keyToFile(key, config.WordListKey)
+	fileName, ok := keyToFile(key, option.WordListKey)
 	if !ok {
-		return "", fmt.Errorf("invalid %s value (%s)", config.WordListKey, key)
+		return "", fmt.Errorf("invalid %s value (%s)", option.WordListKey, key)
 	}
 
-	return path.Join(config.WordListKey, fileName), nil
+	return path.Join(option.WordListKey, fileName), nil
 }
 
 // GetWordList retrieves a list of words from an embedded file identified by the
@@ -134,16 +129,15 @@ func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
 }
 
 // GetJSONPreset reads a JSON preset file identified by the given key from
-// embedded files. It returns the content of the JSON file as a string. If the
-// file is not found, cannot be read, or contains invalid JSON, an error is
-// returned.
-func GetJSONPreset(key string) (string, error) {
-	fileName, ok := keyToFile(key, config.PresetKey)
+// embedded files. It returns the content of the JSON file as a map, if not an
+// error is returned.
+func GetJSONPreset(key string) (map[string]any, error) {
+	fileName, ok := keyToFile(key, option.PresetKey)
 	if !ok {
-		return "", fmt.Errorf("invalid %s value (%s)", config.PresetKey, key)
+		return nil, fmt.Errorf("invalid %s value (%s)", option.PresetKey, key)
 	}
 
-	filePath := path.Join(config.PresetKey, fileName)
+	filePath := path.Join(option.PresetKey, fileName)
 
 	return loadJSONFileData(filePath, files.ReadFile)
 }

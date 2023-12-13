@@ -3,8 +3,9 @@ package service
 import (
 	"errors"
 
-	"github.com/eljamo/libpass/v4/config"
-	"github.com/eljamo/libpass/v4/internal/stringcheck"
+	"github.com/eljamo/libpass/v5/config"
+	"github.com/eljamo/libpass/v5/config/option"
+	"github.com/eljamo/libpass/v5/internal/validator"
 )
 
 // Defines the interface for a service that can separate elements of a string
@@ -19,13 +20,13 @@ type SeparatorService interface {
 // Implements the SeparatorService, providing functionality to separate string
 // slices.
 type DefaultSeparatorService struct {
-	cfg    *config.Config
+	cfg    *config.Settings
 	rngSvc RNGService
 }
 
 // Creates a new instance of DefaultSeparatorService. It validates the provided
 // configuration and returns an error if the configuration is invalid.
-func NewSeparatorService(cfg *config.Config, rngSvc RNGService) (*DefaultSeparatorService, error) {
+func NewSeparatorService(cfg *config.Settings, rngSvc RNGService) (*DefaultSeparatorService, error) {
 	svc := &DefaultSeparatorService{cfg, rngSvc}
 
 	if err := svc.validate(); err != nil {
@@ -58,7 +59,7 @@ func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 // returns a predefined character or a random character from a specified
 // alphabet. Returns an error if it fails to return a random character.
 func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
-	if s.cfg.SeparatorCharacter == config.Random {
+	if s.cfg.SeparatorCharacter == option.Random {
 		sa := s.cfg.SeparatorAlphabet
 		num, err := s.rngSvc.GenerateWithMax(len(sa))
 
@@ -77,17 +78,17 @@ func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
 // valid random character from the alphabet. Returns an error if the
 // configuration is invalid.
 func (s *DefaultSeparatorService) validate() error {
-	if s.cfg.SeparatorCharacter != config.Random && len(s.cfg.SeparatorCharacter) > 1 {
+	if s.cfg.SeparatorCharacter != option.Random && len(s.cfg.SeparatorCharacter) > 1 {
 		return errors.New("separator_character must be a single character if specified")
 	}
 
-	if s.cfg.SeparatorCharacter == config.Random {
+	if s.cfg.SeparatorCharacter == option.Random {
 		sa := s.cfg.SeparatorAlphabet
 		if len(sa) == 0 {
 			return errors.New("separator_alphabet cannot be empty")
 		}
 
-		chk := stringcheck.HasElementWithLengthGreaterThanOne(sa)
+		chk := validator.HasElementWithLengthGreaterThanOne(sa)
 		if chk {
 			return errors.New("separator_alphabet cannot contain elements with a length greater than 1")
 		}

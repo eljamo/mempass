@@ -4,12 +4,21 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 	"unicode"
 
-	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v5/config"
+	"github.com/eljamo/libpass/v5/config/option"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
+
+// Setup a pool of casers to be used for capitalisation
+var caserPool = &sync.Pool{
+	New: func() any {
+		return cases.Title(language.English)
+	},
+}
 
 // Defines an interface for transforming a slice of strings
 type TransformerService interface {
@@ -21,13 +30,13 @@ type TransformerService interface {
 // Implements the TransformerService, providing functionality to transform
 // string slices based on a predefined configuration.
 type DefaultTransformerService struct {
-	cfg    *config.Config
+	cfg    *config.Settings
 	rngSvc RNGService
 }
 
 // Creates a new valid instance of DefaultTransformerService with the given
 // configuration and RNG service
-func NewTransformerService(cfg *config.Config, rngSvc RNGService) (*DefaultTransformerService, error) {
+func NewTransformerService(cfg *config.Settings, rngSvc RNGService) (*DefaultTransformerService, error) {
 	svc := &DefaultTransformerService{cfg, rngSvc}
 
 	if err := svc.validate(); err != nil {
@@ -54,27 +63,27 @@ func NewTransformerService(cfg *config.Config, rngSvc RNGService) (*DefaultTrans
 //   - Upper
 func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) {
 	switch s.cfg.CaseTransform {
-	case config.Alternate:
+	case option.Alternate:
 		return s.alternate(slice), nil
-	case config.AlternateLettercase:
+	case option.AlternateLettercase:
 		return alternateLettercase(slice)
-	case config.Capitalise:
+	case option.Capitalise:
 		return s.capitalise(slice), nil
-	case config.CapitaliseInvert:
+	case option.CapitaliseInvert:
 		return s.capitaliseInvert(slice)
-	case config.Invert: // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net configs
+	case option.Invert: // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net configs
 		return s.capitaliseInvert(slice)
-	case config.Lower:
+	case option.Lower:
 		return s.lower(slice), nil
-	case config.LowerVowelUpperConsonant:
+	case option.LowerVowelUpperConsonant:
 		return lowerVowelUpperConsonant(slice)
-	case config.Random:
+	case option.Random:
 		return s.random(slice)
-	case config.Sentence:
+	case option.Sentence:
 		return s.sentence(slice), nil
-	case config.Upper:
+	case option.Upper:
 		return s.upper(slice), nil
-	case config.None:
+	case option.None:
 	default:
 		return slice, nil
 	}
@@ -134,10 +143,12 @@ func alternateLettercase(slice []string) ([]string, error) {
 //
 // Example Output: string[]{"Hello", "World"}
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
-	caser := cases.Title(language.English)
+	caser := caserPool.Get().(cases.Caser)
 	for i, w := range slice {
 		slice[i] = caser.String(w)
 	}
+
+	caserPool.Put(caser)
 
 	return slice
 }
@@ -163,6 +174,7 @@ func (s *DefaultTransformerService) capitaliseInvert(slice []string) ([]string, 
 		}
 		slice[i] = sb.String()
 	}
+
 	return slice, nil
 }
 
@@ -205,6 +217,7 @@ func lowerVowelUpperConsonant(slice []string) ([]string, error) {
 		}
 		result = append(result, sb.String())
 	}
+
 	return result, nil
 }
 
@@ -229,7 +242,7 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 //
 // Example Output: string[]{"Hello", "world"}
 func (s *DefaultTransformerService) sentence(slice []string) []string {
-	caser := cases.Title(language.English)
+	caser := caserPool.Get().(cases.Caser)
 	for i, w := range slice {
 		if i == 0 {
 			slice[i] = caser.String(w)
@@ -238,11 +251,13 @@ func (s *DefaultTransformerService) sentence(slice []string) []string {
 		}
 	}
 
+	caserPool.Put(caser)
+
 	return slice
 }
 
 func (s *DefaultTransformerService) validate() error {
-	if !slices.Contains(config.TransformType, s.cfg.CaseTransform) {
+	if !slices.Contains(option.TransformTypes, s.cfg.CaseTransform) {
 		return fmt.Errorf("not a valid case_transform type (%s)", s.cfg.CaseTransform)
 	}
 

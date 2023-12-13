@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/eljamo/libpass/v4/asset"
-	"github.com/eljamo/libpass/v4/config"
+	"github.com/eljamo/libpass/v5/asset"
+	"github.com/eljamo/libpass/v5/config"
 )
 
 // Defines the interface for a service that extracts words from word lists
@@ -18,7 +18,7 @@ type WordListService interface {
 // Implements the interface WordListService, providing functionality to extract
 // words from a word list.
 type DefaultWordListService struct {
-	cfg      *config.Config
+	cfg      *config.Settings
 	rngSvc   RNGService
 	wordList []string
 }
@@ -26,7 +26,7 @@ type DefaultWordListService struct {
 // Creates a new instance of DefaultWordListService. It requires configuration
 // and a random number generation service. It returns an error if the
 // configuration is invalid.
-func NewWordListService(cfg *config.Config, rngSvc RNGService) (*DefaultWordListService, error) {
+func NewWordListService(cfg *config.Settings, rngSvc RNGService) (*DefaultWordListService, error) {
 	if cfg.NumWords < 2 {
 		return nil, errors.New("num_words must be greater than or equal to 2")
 	}

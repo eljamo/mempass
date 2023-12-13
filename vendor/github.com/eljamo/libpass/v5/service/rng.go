@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	maxInt   = int(^uint(0) >> 1) // Maximum value for an int variable on the system
-	maxDigit = 10                 // Maximum digit value, used in GenerateDigit.
+	maxInt   = int(^uint(0) >> 1) // Maximum value for an int variable for the build architecture
+	maxDigit = 10                 // Maximum digit value, used in GenerateDigit
 )
 
 // RNGService defines an interface for random number generation.

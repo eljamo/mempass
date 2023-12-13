@@ -1,4 +1,4 @@
-package stringcheck
+package validator
 
 func HasElementWithLengthGreaterThanOne(s []string) bool {
 	for _, str := range s {
@@ -10,7 +10,7 @@ func HasElementWithLengthGreaterThanOne(s []string) bool {
 	return false
 }
 
-func IsElementInSlice(s []string, e string) bool {
+func IsElementInSlice[T comparable](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
 			return true
