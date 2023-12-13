@@ -10,23 +10,23 @@ import (
 	"github.com/spf13/pflag"
 )
 
-const CustomConfigKeyPath = "custom_config_path"
+const CustomConfigPathKey string = "custom_config_path"
 
 func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
-	baseCfg, customCfg, err := loadJSONFiles(cmd)
+	basePreset, customCfg, err := loadJSONFiles(cmd)
 	if err != nil {
-		return nil, fmt.Errorf("loadJSONFiles error: %w", err)
+		return nil, err
 	}
 
-	flagCfg, err := getCmdFlagsAsJSON(cmd)
+	flagCfg, err := getCmdFlags(cmd)
 	if err != nil {
-		return nil, fmt.Errorf("getCmdFlags error: %w", err)
+		return nil, err
 	}
 
-	return config.Generate(baseCfg, customCfg, flagCfg)
+	return config.Generate(basePreset, customCfg, flagCfg)
 }
 
-// loadJSONFiles loads the base config and the custom config from the JSON files
+// Loads the base preset and the custom config from the JSON files
 func loadJSONFiles(cmd *cobra.Command) (map[string]any, map[string]any, error) {
 	customCfg, err := getCustomConfigJSON(cmd)
 	if err != nil {
@@ -38,21 +38,22 @@ func loadJSONFiles(cmd *cobra.Command) (map[string]any, map[string]any, error) {
 		return nil, nil, err
 	}
 
-	baseCfg, err := asset.GetJSONPreset(presetValue)
+	basePreset, err := asset.GetJSONPreset(presetValue)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return baseCfg, customCfg, nil
+	return basePreset, customCfg, nil
 }
 
+// Loads the custom config JSON file
 func getCustomConfigJSON(cmd *cobra.Command) (map[string]any, error) {
-	path, err := getCustomConfigPath(cmd)
+	path, err := cmd.Flags().GetString(CustomConfigPathKey)
 	if err != nil {
 		return nil, err
 	}
 
-	customCfgJSON, err := loadCustomConfig(path)
+	customCfgJSON, err := loadCustomConfigJSON(path)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,8 @@ func getCustomConfigJSON(cmd *cobra.Command) (map[string]any, error) {
 	return customCfgJSON, nil
 }
 
-func getCmdFlagsAsJSON(cmd *cobra.Command) (map[string]any, error) {
+// Returns a map of the cmd flags and their values
+func getCmdFlags(cmd *cobra.Command) (map[string]any, error) {
 	flags := make(map[string]any)
 
 	var err error
@@ -69,35 +71,27 @@ func getCmdFlagsAsJSON(cmd *cobra.Command) (map[string]any, error) {
 			return
 		}
 
-		var flagErr error
 		switch flag.Value.Type() {
 		case "string":
-			flags[flag.Name], flagErr = cmd.Flags().GetString(flag.Name)
+			flags[flag.Name], err = cmd.Flags().GetString(flag.Name)
 		case "int":
-			flags[flag.Name], flagErr = cmd.Flags().GetInt(flag.Name)
+			flags[flag.Name], err = cmd.Flags().GetInt(flag.Name)
 		case "bool":
-			flags[flag.Name], flagErr = cmd.Flags().GetBool(flag.Name)
+			flags[flag.Name], err = cmd.Flags().GetBool(flag.Name)
 		case "stringSlice":
-			flags[flag.Name], flagErr = cmd.Flags().GetStringSlice(flag.Name)
-		}
-
-		if flagErr != nil {
-			err = flagErr
+			flags[flag.Name], err = cmd.Flags().GetStringSlice(flag.Name)
 		}
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("getCmdFlagsAsJSON error: %w", err)
+		return nil, fmt.Errorf("error parsing cmd flags (%w)", err)
 	}
 
 	return flags, nil
 }
 
-func getCustomConfigPath(cmd *cobra.Command) (string, error) {
-	return cmd.Flags().GetString(CustomConfigKeyPath)
-}
-
-func loadCustomConfig(path string) (map[string]any, error) {
+// Loads the custom config JSON file
+func loadCustomConfigJSON(path string) (map[string]any, error) {
 	if path == "" {
 		return nil, nil
 	}
@@ -105,6 +99,7 @@ func loadCustomConfig(path string) (map[string]any, error) {
 	return asset.LoadJSONFile(path)
 }
 
+// Returns the preset value from the custom config if it exists
 func getPresetFromCustomConfig(customCfgJSON map[string]any) string {
 	if customCfgJSON == nil {
 		return ""
@@ -117,6 +112,7 @@ func getPresetFromCustomConfig(customCfgJSON map[string]any) string {
 	return ""
 }
 
+// Returns the preset value
 func getPresetValue(cmd *cobra.Command, customJSONCfg map[string]any) (string, error) {
 	var presetValue string
 	presetFlag, presetArgPresent, err := checkPresetFlag(cmd)
@@ -135,16 +131,18 @@ func getPresetValue(cmd *cobra.Command, customJSONCfg map[string]any) (string, e
 	return presetValue, nil
 }
 
+// Returns the preset flag value and if preset flag was explicitly set
 func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
 	presetArgPresent := isFlagSet(cmd, option.PresetKey)
-	presetFlag, err := cmd.Flags().GetString(option.PresetKey)
-	if presetArgPresent && (err != nil || presetFlag == "") {
-		return "", false, fmt.Errorf("invalid %s flag: %w", option.PresetKey, err)
+	presetFlagValue, err := cmd.Flags().GetString(option.PresetKey)
+	if presetArgPresent && (err != nil || presetFlagValue == "") {
+		return "", false, fmt.Errorf("invalid %s flag (%w)", option.PresetKey, err)
 	}
 
-	return presetFlag, presetArgPresent, nil
+	return presetFlagValue, presetArgPresent, nil
 }
 
+// Checks if a flag has been explicitly set
 func isFlagSet(cmd *cobra.Command, flagKey string) bool {
 	var flagSet bool
 	cmd.Flags().Visit(func(flag *pflag.Flag) {
