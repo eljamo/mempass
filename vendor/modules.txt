@@ -1,4 +1,4 @@
-# github.com/eljamo/libpass/v5 v5.0.0
+# github.com/eljamo/libpass/v5 v5.1.0
 ## explicit; go 1.21.5
 github.com/eljamo/libpass/v5/asset
 github.com/eljamo/libpass/v5/config

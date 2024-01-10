@@ -66,7 +66,7 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 	case option.Alternate:
 		return s.alternate(slice), nil
 	case option.AlternateLettercase:
-		return alternateLettercase(slice)
+		return s.alternateLettercase(slice)
 	case option.Capitalise:
 		return s.capitalise(slice), nil
 	case option.CapitaliseInvert:
@@ -76,7 +76,7 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 	case option.Lower:
 		return s.lower(slice), nil
 	case option.LowerVowelUpperConsonant:
-		return lowerVowelUpperConsonant(slice)
+		return s.lowerVowelUpperConsonant(slice)
 	case option.Random:
 		return s.random(slice)
 	case option.Sentence:
@@ -113,7 +113,7 @@ func (s *DefaultTransformerService) alternate(slice []string) []string {
 // or an error if an issue occurs during string building.
 //
 // Example Output: string[]{"hElLo", "WoRlD"}, nil
-func alternateLettercase(slice []string) ([]string, error) {
+func (s *DefaultTransformerService) alternateLettercase(slice []string) ([]string, error) {
 	var result []string
 	for _, str := range slice {
 		var sb strings.Builder
@@ -198,7 +198,7 @@ func isVowel(r rune) bool {
 // occurs during the string building process.
 //
 // Example Output: string[]{"hEllO", "wOrld"}, nil
-func lowerVowelUpperConsonant(slice []string) ([]string, error) {
+func (s *DefaultTransformerService) lowerVowelUpperConsonant(slice []string) ([]string, error) {
 	var result []string
 	for _, str := range slice {
 		var sb strings.Builder

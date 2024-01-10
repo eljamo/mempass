@@ -7,24 +7,24 @@ import (
 	"github.com/eljamo/libpass/v5/internal/merger"
 )
 
-func mapToJSONString(m map[string]any) (string, error) {
+func mapToJSONString(m map[string]any) ([]byte, error) {
 	mj, err := json.Marshal(m)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(mj), nil
+	return mj, nil
 }
 
-func mergeMaps(ms ...map[string]any) (string, error) {
+func mergeMaps(ms ...map[string]any) ([]byte, error) {
 	mm := merger.Map(ms...)
 
 	return mapToJSONString(mm)
 }
 
-func jsonToSettings(js string) (*Settings, error) {
+func jsonToSettings(js []byte) (*Settings, error) {
 	var cfg Settings
-	if err := json.Unmarshal([]byte(js), &cfg); err != nil {
+	if err := json.Unmarshal(js, &cfg); err != nil {
 		return nil, err
 	}
 
