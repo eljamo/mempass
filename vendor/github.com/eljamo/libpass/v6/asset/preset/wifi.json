@@ -1,0 +1,40 @@
+{
+    "word_list": "EN",
+    "num_passwords": 3,
+    "num_words": 6,
+    "word_length_min": 4,
+    "word_length_max": 8,
+    "case_transform": "RANDOM",
+    "separator_character": "RANDOM",
+    "separator_alphabet": [
+        "-",
+        "+",
+        "=",
+        ".",
+        "*",
+        "_",
+        "|",
+        "~",
+        ","
+    ],
+    "padding_digits_before": 4,
+    "padding_digits_after": 4,
+    "padding_type": "ADAPTIVE",
+    "padding_character": "RANDOM",
+    "symbol_alphabet": [
+        "!",
+        "@",
+        "$",
+        "%",
+        "^",
+        "&",
+        "*",
+        "+",
+        "=",
+        ":",
+        "|",
+        "~",
+        "?"
+    ],
+    "pad_to_length": 63
+}
