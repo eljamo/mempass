@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/eljamo/libpass/v5/asset"
-	"github.com/eljamo/libpass/v5/config"
-	"github.com/eljamo/libpass/v5/config/option"
+	"github.com/eljamo/libpass/v6/asset"
+	"github.com/eljamo/libpass/v6/config"
+	"github.com/eljamo/libpass/v6/config/option"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -13,7 +13,7 @@ import (
 const CustomConfigPathKey string = "custom_config_path"
 
 func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
-	basePreset, customCfg, err := loadJSONFiles(cmd)
+	customCfg, err := loadCustomConfig(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -23,27 +23,41 @@ func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
 		return nil, err
 	}
 
-	return config.Generate(basePreset, customCfg, flagCfg)
+	presetValue, err := getPresetValue(cmd, customCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	if presetValue == option.Default {
+		return config.New(customCfg, flagCfg)
+	}
+
+	basePreset, err := loadBasePreset(cmd, presetValue)
+	if err != nil {
+		return nil, err
+	}
+
+	return config.New(basePreset, customCfg, flagCfg)
 }
 
 // Loads the base preset and the custom config from the JSON files
-func loadJSONFiles(cmd *cobra.Command) (map[string]any, map[string]any, error) {
+func loadCustomConfig(cmd *cobra.Command) (map[string]any, error) {
 	customCfg, err := getCustomConfigJSON(cmd)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	presetValue, err := getPresetValue(cmd, customCfg)
-	if err != nil {
-		return nil, nil, err
-	}
+	return customCfg, nil
+}
 
+// Loads the base preset and the custom config from the JSON files
+func loadBasePreset(cmd *cobra.Command, presetValue string) (map[string]any, error) {
 	basePreset, err := asset.GetJSONPreset(presetValue)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return basePreset, customCfg, nil
+	return basePreset, nil
 }
 
 // Loads the custom config JSON file
@@ -142,7 +156,7 @@ func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
 	return presetFlagValue, presetArgPresent, nil
 }
 
-// Checks if a flag has been explicitly set
+// Checks if a Cobra flag has been explicitly set
 func isFlagSet(cmd *cobra.Command, flagKey string) bool {
 	var flagSet bool
 	cmd.Flags().Visit(func(flag *pflag.Flag) {

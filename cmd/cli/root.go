@@ -5,12 +5,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eljamo/libpass/v5/config/option"
-	"github.com/eljamo/libpass/v5/service"
+	"github.com/eljamo/libpass/v6/config/option"
+	"github.com/eljamo/libpass/v6/service"
 	"github.com/spf13/cobra"
 )
 
-var version = "1.9.0"
+var version = "1.10.0"
 
 var rootCmd = &cobra.Command{
 	Use:          "mempass",
