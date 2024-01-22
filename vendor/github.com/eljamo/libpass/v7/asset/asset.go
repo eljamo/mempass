@@ -9,35 +9,35 @@ import (
 	"path"
 	"strings"
 
-	"github.com/eljamo/libpass/v6/config/option"
+	"github.com/eljamo/libpass/v7/config/option"
 )
 
 //go:embed preset/* word_list/*
 var files embed.FS
 var fileMap = map[string]map[string]string{
-	option.PresetKey: {
-		option.AppleID:       "appleid.json",
-		option.Default:       "default.json",
-		option.NTLM:          "ntlm.json",
-		option.SecurityQ:     "securityq.json",
-		option.Web16:         "web16.json",
-		option.Web16XKPasswd: "web16_xkpasswd.json",
-		option.Web32:         "web32.json",
-		option.WiFi:          "wifi.json",
-		option.XKCD:          "xkcd.json",
-		option.XKCDXKPasswd:  "xkcd_xkpasswd.json",
+	option.ConfigKeyPreset: {
+		option.PresetAppleID:       "appleid.json",
+		option.PresetDefault:       "default.json",
+		option.PresetNTLM:          "ntlm.json",
+		option.PresetSecurityQ:     "securityq.json",
+		option.PresetWeb16:         "web16.json",
+		option.PresetWeb16XKPasswd: "web16_xkpasswd.json",
+		option.PresetWeb32:         "web32.json",
+		option.PresetWiFi:          "wifi.json",
+		option.PresetXKCD:          "xkcd.json",
+		option.PresetXKCDXKPasswd:  "xkcd_xkpasswd.json",
 	},
-	option.WordListKey: {
-		option.All:           "all.txt",
-		option.DoctorWho:     "doctor_who.txt",
-		option.EN:            "en.txt",
-		option.ENSmall:       "en_small.txt",
-		option.GameOfThrones: "game_of_thrones.txt",
-		option.HarryPotter:   "harry_potter.txt",
-		option.MiddleEarth:   "middle_earth.txt",
-		option.Pokemon:       "pokemon.txt",
-		option.StarTrek:      "star_trek.txt",
-		option.StarWars:      "star_wars.txt",
+	option.ConfigKeyWordList: {
+		option.WordListAll:           "all.txt",
+		option.WordListDoctorWho:     "doctor_who.txt",
+		option.WordListEN:            "en.txt",
+		option.WordListENSmall:       "en_small.txt",
+		option.WordListGameOfThrones: "game_of_thrones.txt",
+		option.WordListHarryPotter:   "harry_potter.txt",
+		option.WordListMiddleEarth:   "middle_earth.txt",
+		option.WordListPokemon:       "pokemon.txt",
+		option.WordListStarTrek:      "star_trek.txt",
+		option.WordListStarWars:      "star_wars.txt",
 	},
 }
 
@@ -69,12 +69,12 @@ func LoadJSONFile(filePath string) (map[string]any, error) {
 }
 
 func getWordListFilePath(key string) (string, error) {
-	fileName, ok := keyToFile(key, option.WordListKey)
+	fileName, ok := keyToFile(key, option.ConfigKeyWordList)
 	if !ok {
-		return "", fmt.Errorf("invalid %s value (%s)", option.WordListKey, key)
+		return "", fmt.Errorf("invalid %s value (%s)", option.ConfigKeyWordList, key)
 	}
 
-	return path.Join(option.WordListKey, fileName), nil
+	return path.Join(option.ConfigKeyWordList, fileName), nil
 }
 
 // GetWordList retrieves a list of words from an embedded file identified by the
@@ -132,12 +132,12 @@ func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
 // embedded files. It returns the content of the JSON file as a map, if not an
 // error is returned.
 func GetJSONPreset(key string) (map[string]any, error) {
-	fileName, ok := keyToFile(key, option.PresetKey)
+	fileName, ok := keyToFile(key, option.ConfigKeyPreset)
 	if !ok {
-		return nil, fmt.Errorf("invalid %s value (%s)", option.PresetKey, key)
+		return nil, fmt.Errorf("invalid %s value (%s)", option.ConfigKeyPreset, key)
 	}
 
-	filePath := path.Join(option.PresetKey, fileName)
+	filePath := path.Join(option.ConfigKeyPreset, fileName)
 
 	return loadJSONFileData(filePath, files.ReadFile)
 }

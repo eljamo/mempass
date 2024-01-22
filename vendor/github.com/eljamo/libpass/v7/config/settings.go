@@ -1,6 +1,6 @@
 package config
 
-import "github.com/eljamo/libpass/v6/config/option"
+import "github.com/eljamo/libpass/v7/config/option"
 
 type Settings struct {
 	// The type of case transformation to apply to the words
@@ -43,20 +43,20 @@ type Settings struct {
 // This is used when no settings are given to the New function.
 func DefaultSettings() *Settings {
 	return &Settings{
-		CaseTransform:           option.Random,
+		CaseTransform:           option.CaseTransformRandom,
 		NumPasswords:            3,
 		NumWords:                3,
-		PaddingCharacter:        option.Random,
+		PaddingCharacter:        option.PaddingCharacterRandom,
 		PaddingCharactersAfter:  2,
 		PaddingCharactersBefore: 2,
 		PaddingDigitsAfter:      2,
 		PaddingDigitsBefore:     2,
-		PaddingType:             option.Fixed,
+		PaddingType:             option.PaddingTypeFixed,
 		SeparatorAlphabet:       option.DefaultSpecialCharacters,
-		SeparatorCharacter:      option.Random,
+		SeparatorCharacter:      option.SeparatorCharacterRandom,
 		SymbolAlphabet:          option.DefaultSpecialCharacters,
 		WordLengthMax:           8,
 		WordLengthMin:           4,
-		WordList:                option.EN,
+		WordList:                option.WordListEN,
 	}
 }

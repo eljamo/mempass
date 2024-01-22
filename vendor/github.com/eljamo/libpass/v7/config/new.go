@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/eljamo/libpass/v6/internal/merger"
+	"github.com/eljamo/libpass/v7/internal/merger"
 )
 
 func mapToJSON(m map[string]any) ([]byte, error) {

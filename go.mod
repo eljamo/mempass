@@ -3,7 +3,7 @@ module github.com/eljamo/mempass
 go 1.21.5
 
 require (
-	github.com/eljamo/libpass/v6 v6.0.0
+	github.com/eljamo/libpass/v7 v7.0.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 )

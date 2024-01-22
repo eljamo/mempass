@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/eljamo/libpass/v6/asset"
-	"github.com/eljamo/libpass/v6/config"
-	"github.com/eljamo/libpass/v6/config/option"
+	"github.com/eljamo/libpass/v7/asset"
+	"github.com/eljamo/libpass/v7/config"
+	"github.com/eljamo/libpass/v7/config/option"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -28,7 +28,7 @@ func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
 		return nil, err
 	}
 
-	if presetValue == option.Default {
+	if presetValue == option.PresetDefault {
 		return config.New(customCfg, flagCfg)
 	}
 
@@ -119,7 +119,7 @@ func getPresetFromCustomConfig(customCfgJSON map[string]any) string {
 		return ""
 	}
 
-	if preset, ok := customCfgJSON[option.PresetKey].(string); ok {
+	if preset, ok := customCfgJSON[option.ConfigKeyPreset].(string); ok {
 		return preset
 	}
 
@@ -147,10 +147,10 @@ func getPresetValue(cmd *cobra.Command, customJSONCfg map[string]any) (string, e
 
 // Returns the preset flag value and if preset flag was explicitly set
 func checkPresetFlag(cmd *cobra.Command) (string, bool, error) {
-	presetArgPresent := isFlagSet(cmd, option.PresetKey)
-	presetFlagValue, err := cmd.Flags().GetString(option.PresetKey)
+	presetArgPresent := isFlagSet(cmd, option.ConfigKeyPreset)
+	presetFlagValue, err := cmd.Flags().GetString(option.ConfigKeyPreset)
 	if presetArgPresent && (err != nil || presetFlagValue == "") {
-		return "", false, fmt.Errorf("invalid %s flag (%w)", option.PresetKey, err)
+		return "", false, fmt.Errorf("invalid %s flag (%w)", option.ConfigKeyPreset, err)
 	}
 
 	return presetFlagValue, presetArgPresent, nil

@@ -1,11 +1,11 @@
 package service
 
 import (
-	"errors"
+	"fmt"
 
-	"github.com/eljamo/libpass/v6/config"
-	"github.com/eljamo/libpass/v6/config/option"
-	"github.com/eljamo/libpass/v6/internal/validator"
+	"github.com/eljamo/libpass/v7/config"
+	"github.com/eljamo/libpass/v7/config/option"
+	"github.com/eljamo/libpass/v7/internal/validator"
 )
 
 // Defines the interface for a service that can separate elements of a string
@@ -59,15 +59,14 @@ func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 // returns a predefined character or a random character from a specified
 // alphabet. Returns an error if it fails to return a random character.
 func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
-	if s.cfg.SeparatorCharacter == option.Random {
-		sa := s.cfg.SeparatorAlphabet
-		num, err := s.rngSvc.GenerateWithMax(len(sa))
+	if s.cfg.SeparatorCharacter == option.SeparatorCharacterRandom {
+		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SeparatorAlphabet))
 
 		if err != nil {
 			return "", err
 		}
 
-		return string(sa[num]), nil
+		return string(s.cfg.SeparatorAlphabet[num]), nil
 	}
 
 	return s.cfg.SeparatorCharacter, nil
@@ -78,19 +77,18 @@ func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
 // valid random character from the alphabet. Returns an error if the
 // configuration is invalid.
 func (s *DefaultSeparatorService) validate() error {
-	if s.cfg.SeparatorCharacter != option.Random && len(s.cfg.SeparatorCharacter) > 1 {
-		return errors.New("separator_character must be a single character if specified")
+	if s.cfg.SeparatorCharacter != option.SeparatorCharacterRandom && len(s.cfg.SeparatorCharacter) > 1 {
+		return fmt.Errorf("%s must be a single character if specified", option.ConfigKeySeparatorCharacter)
 	}
 
-	if s.cfg.SeparatorCharacter == option.Random {
-		sa := s.cfg.SeparatorAlphabet
-		if len(sa) == 0 {
-			return errors.New("separator_alphabet cannot be empty")
+	if s.cfg.SeparatorCharacter == option.SeparatorCharacterRandom {
+		if len(s.cfg.SeparatorAlphabet) == 0 {
+			return fmt.Errorf("%s cannot be empty", option.ConfigKeySeparatorAlphabet)
 		}
 
-		chk := validator.HasElementWithLengthGreaterThanOne(sa)
+		chk := validator.HasElementWithLengthGreaterThanOne(s.cfg.SeparatorAlphabet)
 		if chk {
-			return errors.New("separator_alphabet cannot contain elements with a length greater than 1")
+			return fmt.Errorf("%s cannot contain elements with a length greater than 1", option.ConfigKeySeparatorAlphabet)
 		}
 	}
 

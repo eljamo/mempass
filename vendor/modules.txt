@@ -1,11 +1,11 @@
-# github.com/eljamo/libpass/v6 v6.0.0
+# github.com/eljamo/libpass/v7 v7.0.0
 ## explicit; go 1.21.5
-github.com/eljamo/libpass/v6/asset
-github.com/eljamo/libpass/v6/config
-github.com/eljamo/libpass/v6/config/option
-github.com/eljamo/libpass/v6/internal/merger
-github.com/eljamo/libpass/v6/internal/validator
-github.com/eljamo/libpass/v6/service
+github.com/eljamo/libpass/v7/asset
+github.com/eljamo/libpass/v7/config
+github.com/eljamo/libpass/v7/config/option
+github.com/eljamo/libpass/v7/internal/merger
+github.com/eljamo/libpass/v7/internal/validator
+github.com/eljamo/libpass/v7/service
 # github.com/inconshreveable/mousetrap v1.1.0
 ## explicit; go 1.18
 github.com/inconshreveable/mousetrap

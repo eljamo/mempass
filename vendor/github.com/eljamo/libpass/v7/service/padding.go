@@ -1,14 +1,14 @@
 package service
 
 import (
-	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/eljamo/libpass/v6/config"
-	"github.com/eljamo/libpass/v6/config/option"
-	"github.com/eljamo/libpass/v6/internal/validator"
+	"github.com/eljamo/libpass/v7/config"
+	"github.com/eljamo/libpass/v7/config/option"
+	"github.com/eljamo/libpass/v7/internal/validator"
 )
 
 // Defines the interface for a service that provides functionality to pad a
@@ -65,10 +65,8 @@ func (s *DefaultPaddingService) Pad(slice []string) (string, error) {
 // configuration. It returns a slice with the added digits or an error if the
 // digits cannot be generated.
 func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
-	before, after := s.cfg.PaddingDigitsBefore, s.cfg.PaddingDigitsAfter
-	paddedSlice := make([]string, 0, before+len(slice)+after)
-
-	rdb, err := s.generateRandomDigits(before)
+	paddedSlice := make([]string, 0, s.cfg.PaddingDigitsBefore+len(slice)+s.cfg.PaddingDigitsAfter)
+	rdb, err := s.generateRandomDigits(s.cfg.PaddingDigitsBefore)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +74,7 @@ func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 	paddedSlice = append(paddedSlice, rdb...)
 	paddedSlice = append(paddedSlice, slice...)
 
-	rda, err := s.generateRandomDigits(after)
+	rda, err := s.generateRandomDigits(s.cfg.PaddingDigitsAfter)
 	if err != nil {
 		return nil, err
 	}
@@ -109,16 +107,15 @@ func (s *DefaultPaddingService) removeEdgeSeparatorCharacter(slice []string) []s
 		return slice
 	}
 
-	sc := s.cfg.SeparatorCharacter
-	if sc == option.Random {
+	if s.cfg.SeparatorCharacter == option.PaddingCharacterRandom {
 		return s.removeRandomEdgeSeparatorCharacter(slice)
 	}
 
 	start, end := 0, len(slice)
-	if slice[start] == sc {
+	if slice[start] == s.cfg.SeparatorCharacter {
 		start++
 	}
-	if end > start && slice[end-1] == sc {
+	if end > start && slice[end-1] == s.cfg.SeparatorCharacter {
 		end--
 	}
 
@@ -132,16 +129,15 @@ func (s *DefaultPaddingService) removeRandomEdgeSeparatorCharacter(slice []strin
 		return slice
 	}
 
-	sa := s.cfg.SeparatorAlphabet
-	if len(sa) == 0 {
+	if len(s.cfg.SeparatorAlphabet) == 0 {
 		return slice
 	}
 
 	start, end := 0, len(slice)
-	if validator.IsElementInSlice(sa, slice[start]) {
+	if validator.IsElementInSlice(s.cfg.SeparatorAlphabet, slice[start]) {
 		start++
 	}
-	if end > start && validator.IsElementInSlice(sa, slice[end-1]) {
+	if end > start && validator.IsElementInSlice(s.cfg.SeparatorAlphabet, slice[end-1]) {
 		end--
 	}
 
@@ -158,11 +154,11 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	}
 
 	switch s.cfg.PaddingType {
-	case option.Fixed:
+	case option.PaddingTypeFixed:
 		return s.fixed(pw, char)
-	case option.Adaptive:
+	case option.PaddingTypeAdaptive:
 		return s.adaptive(pw, char), nil
-	case option.None:
+	case option.PaddingTypeNone:
 		return pw, nil
 	}
 
@@ -172,7 +168,7 @@ func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 // Retrieves the character to be used for padding. It selects a random character
 // from the symbol alphabet if the padding character is set to random.
 func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
-	if s.cfg.PaddingCharacter == option.Random {
+	if s.cfg.PaddingCharacter == option.PaddingCharacterRandom {
 		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SymbolAlphabet))
 		if err != nil {
 			return "", err
@@ -196,13 +192,12 @@ func (s *DefaultPaddingService) fixed(pw string, char string) (string, error) {
 // The padding is added at the end of the string and uses the provided
 // padding character.
 func (s *DefaultPaddingService) adaptive(pw string, char string) string {
-	padLen := s.cfg.PadToLength
 	pwLen := utf8.RuneCountInString(pw)
-	if padLen <= pwLen {
+	if s.cfg.PadToLength <= pwLen {
 		return pw
 	}
 
-	diff := padLen - pwLen
+	diff := s.cfg.PadToLength - pwLen
 	padding := strings.Repeat(char, diff)
 
 	return pw + padding
@@ -211,32 +206,31 @@ func (s *DefaultPaddingService) adaptive(pw string, char string) string {
 // Checks the service's configuration for any invalid values. It ensures the
 // integrity of the padding settings before processing the padding operations.
 func (s *DefaultPaddingService) validate() error {
-	if s.cfg.PaddingType != option.None && s.cfg.PaddingCharacter != option.Random && len(s.cfg.PaddingCharacter) > 1 {
-		return errors.New("padding_character must be a single character if specified")
+	if s.cfg.PaddingType != option.PaddingTypeNone && s.cfg.PaddingCharacter != option.PaddingCharacterRandom && len(s.cfg.PaddingCharacter) > 1 {
+		return fmt.Errorf("%s must be a single character if specified", option.ConfigKeyPaddingCharacter)
 	}
 
-	if s.cfg.PaddingCharacter == option.Random {
-		sa := s.cfg.SymbolAlphabet
-		if len(sa) == 0 {
-			return errors.New("symbol_alphabet cannot be empty")
+	if s.cfg.PaddingCharacter == option.PaddingCharacterRandom {
+		if len(s.cfg.SymbolAlphabet) == 0 {
+			return fmt.Errorf("%s cannot be empty", option.ConfigKeySymbolAlphabet)
 		}
 
-		chk := validator.HasElementWithLengthGreaterThanOne(sa)
+		chk := validator.HasElementWithLengthGreaterThanOne(s.cfg.SymbolAlphabet)
 		if chk {
-			return errors.New("symbol_alphabet cannot contain elements with a length greater than 1")
+			return fmt.Errorf("%s cannot contain elements with a length greater than 1", option.ConfigKeySymbolAlphabet)
 		}
 	}
 
 	if s.cfg.PaddingDigitsBefore < 0 || s.cfg.PaddingDigitsAfter < 0 {
-		return errors.New("padding_digits_before and padding_digits_after must be greater than or equal to 0")
+		return fmt.Errorf("%s and %s must be greater than or equal to 0", option.ConfigKeyPaddingDigitsBefore, option.ConfigKeyPaddingDigitsAfter)
 	}
 
 	if s.cfg.PaddingCharactersBefore < 0 || s.cfg.PaddingCharactersAfter < 0 {
-		return errors.New("padding_characters_before and padding_characters_after must be greater than or equal to 0")
+		return fmt.Errorf("%s and %s must be greater than or equal to 0", option.ConfigKeyPaddingCharactersBefore, option.ConfigKeyPaddingCharactersAfter)
 	}
 
 	if s.cfg.PadToLength < 0 {
-		return errors.New("pad_to_length must be greater than or equal to 0")
+		return fmt.Errorf("%s must be greater than or equal to 0", option.ConfigKeyPadToLength)
 	}
 
 	return nil

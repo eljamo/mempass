@@ -7,8 +7,8 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/eljamo/libpass/v6/config"
-	"github.com/eljamo/libpass/v6/config/option"
+	"github.com/eljamo/libpass/v7/config"
+	"github.com/eljamo/libpass/v7/config/option"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -63,27 +63,27 @@ func NewTransformerService(cfg *config.Settings, rngSvc RNGService) (*DefaultTra
 //   - Upper
 func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) {
 	switch s.cfg.CaseTransform {
-	case option.Alternate:
+	case option.CaseTransformAlternate:
 		return s.alternate(slice), nil
-	case option.AlternateLettercase:
+	case option.CaseTransformAlternateLettercase:
 		return s.alternateLettercase(slice)
-	case option.Capitalise:
+	case option.CaseTransformCapitalise:
 		return s.capitalise(slice), nil
-	case option.CapitaliseInvert:
+	case option.CaseTransformCapitaliseInvert:
 		return s.capitaliseInvert(slice)
-	case option.Invert: // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net configs
+	case option.CaseTransformInvert: // Same as CapitaliseInvert but reserved to maintain compatibility with xkpasswd.net configs
 		return s.capitaliseInvert(slice)
-	case option.Lower:
+	case option.CaseTransformLower:
 		return s.lower(slice), nil
-	case option.LowerVowelUpperConsonant:
+	case option.CaseTransformLowerVowelUpperConsonant:
 		return s.lowerVowelUpperConsonant(slice)
-	case option.Random:
+	case option.CaseTransformRandom:
 		return s.random(slice)
-	case option.Sentence:
+	case option.CaseTransformSentence:
 		return s.sentence(slice), nil
-	case option.Upper:
+	case option.CaseTransformUpper:
 		return s.upper(slice), nil
-	case option.None:
+	case option.CaseTransformNone:
 	default:
 		return slice, nil
 	}
@@ -258,7 +258,7 @@ func (s *DefaultTransformerService) sentence(slice []string) []string {
 
 func (s *DefaultTransformerService) validate() error {
 	if !slices.Contains(option.TransformTypes, s.cfg.CaseTransform) {
-		return fmt.Errorf("not a valid case_transform type (%s)", s.cfg.CaseTransform)
+		return fmt.Errorf("not a valid %s type (%s)", option.ConfigKeyCaseTransform, s.cfg.CaseTransform)
 	}
 
 	return nil

@@ -1,11 +1,11 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/eljamo/libpass/v6/asset"
-	"github.com/eljamo/libpass/v6/config"
+	"github.com/eljamo/libpass/v7/asset"
+	"github.com/eljamo/libpass/v7/config"
+	"github.com/eljamo/libpass/v7/config/option"
 )
 
 // Defines the interface for a service that extracts words from word lists
@@ -23,12 +23,14 @@ type DefaultWordListService struct {
 	wordList []string
 }
 
+const numWordMin = 2
+
 // Creates a new instance of DefaultWordListService. It requires configuration
 // and a random number generation service. It returns an error if the
 // configuration is invalid.
 func NewWordListService(cfg *config.Settings, rngSvc RNGService) (*DefaultWordListService, error) {
-	if cfg.NumWords < 2 {
-		return nil, errors.New("num_words must be greater than or equal to 2")
+	if cfg.NumWords < numWordMin {
+		return nil, fmt.Errorf("%s must be greater than or equal to %d", option.ConfigKeyNumWords, numWordMin)
 	}
 
 	wordList, err := getWordList(cfg.WordList, cfg.WordLengthMin, cfg.WordLengthMax)
@@ -47,7 +49,13 @@ func NewWordListService(cfg *config.Settings, rngSvc RNGService) (*DefaultWordLi
 // criteria are invalid or the word list cannot be created.
 func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([]string, error) {
 	if wordMaxLength < wordMinLength {
-		return nil, fmt.Errorf("word_length_max (%d) must be greater than or equal to word_length_min (%d)", wordMaxLength, wordMinLength)
+		return nil, fmt.Errorf(
+			"%s (%d) must be greater than or equal to %s (%d)",
+			option.ConfigKeyWordLengthMax,
+			wordMaxLength,
+			option.ConfigKeyWordLengthMin,
+			wordMinLength,
+		)
 	}
 
 	wl, err := asset.GetFilteredWordList(wordList, wordMinLength, wordMaxLength)
@@ -56,7 +64,15 @@ func getWordList(wordList string, wordMinLength int, wordMaxLength int) ([]strin
 	}
 
 	if len(wl) == 0 {
-		return nil, fmt.Errorf("no words found in word list %s with a word_length_min of %d and word_length_max of %d", wordList, wordMinLength, wordMaxLength)
+		return nil, fmt.Errorf(
+			"no words found in %s (%s) with a %s of %d and %s of %d",
+			option.ConfigKeyWordList,
+			wordList,
+			option.ConfigKeyWordLengthMin,
+			wordMinLength,
+			option.ConfigKeyWordLengthMax,
+			wordMaxLength,
+		)
 	}
 
 	return wl, nil
