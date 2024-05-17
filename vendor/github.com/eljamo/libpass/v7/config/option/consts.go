@@ -23,6 +23,7 @@ const (
 
 // Word list constant
 const (
+	WordList40k           string = "40K"
 	WordListAll           string = "ALL"
 	WordListDoctorWho     string = "DOCTOR_WHO"
 	WordListEN            string = "EN"

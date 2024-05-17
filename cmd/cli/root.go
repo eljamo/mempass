@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "1.12.1"
+var version = "1.13.0"
 
 var rootCmd = &cobra.Command{
 	Use:          "mempass",

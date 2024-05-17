@@ -28,6 +28,7 @@ var fileMap = map[string]map[string]string{
 		option.PresetXKCDXKPasswd:  "xkcd_xkpasswd.json",
 	},
 	option.ConfigKeyWordList: {
+		option.WordList40k:           "40k.txt",
 		option.WordListAll:           "all.txt",
 		option.WordListDoctorWho:     "doctor_who.txt",
 		option.WordListEN:            "en.txt",
