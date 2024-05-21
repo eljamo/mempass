@@ -16,7 +16,8 @@ import (
 // Setup a pool of casers to be used for capitalisation
 var caserPool = &sync.Pool{
 	New: func() any {
-		return cases.Title(language.English)
+		c := cases.Title(language.English)
+		return &c
 	},
 }
 
@@ -83,9 +84,6 @@ func (s *DefaultTransformerService) Transform(slice []string) ([]string, error) 
 		return s.sentence(slice), nil
 	case option.CaseTransformUpper:
 		return s.upper(slice), nil
-	case option.CaseTransformNone:
-	default:
-		return slice, nil
 	}
 
 	return slice, nil
@@ -143,7 +141,7 @@ func (s *DefaultTransformerService) alternateLettercase(slice []string) ([]strin
 //
 // Example Output: string[]{"Hello", "World"}
 func (s *DefaultTransformerService) capitalise(slice []string) []string {
-	caser := caserPool.Get().(cases.Caser)
+	caser := caserPool.Get().(*cases.Caser)
 	for i, w := range slice {
 		slice[i] = caser.String(w)
 	}
@@ -242,7 +240,7 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 //
 // Example Output: string[]{"Hello", "world"}
 func (s *DefaultTransformerService) sentence(slice []string) []string {
-	caser := caserPool.Get().(cases.Caser)
+	caser := caserPool.Get().(*cases.Caser)
 	for i, w := range slice {
 		if i == 0 {
 			slice[i] = caser.String(w)

@@ -32,7 +32,7 @@ func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
 		return config.New(customCfg, flagCfg)
 	}
 
-	basePreset, err := loadBasePreset(cmd, presetValue)
+	basePreset, err := loadBasePreset(presetValue)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func loadCustomConfig(cmd *cobra.Command) (map[string]any, error) {
 }
 
 // Loads the base preset and the custom config from the JSON files
-func loadBasePreset(cmd *cobra.Command, presetValue string) (map[string]any, error) {
+func loadBasePreset(presetValue string) (map[string]any, error) {
 	basePreset, err := asset.GetJSONPreset(presetValue)
 	if err != nil {
 		return nil, err

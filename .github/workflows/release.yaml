@@ -9,6 +9,9 @@ permissions:
   contents: write
 
 jobs:
+  lint:
+    uses: ./.github/workflows/golangci-lint.yaml
+    secrets: inherit
   goreleaser:
     runs-on: ubuntu-latest
     steps:

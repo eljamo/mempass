@@ -1,6 +1,8 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/eljamo/libpass/v7 v7.1.0 h1:Z+5KE8jtpon/+6qVMORs9cPYBkdnlz20vbZxlnWT0YI=
-github.com/eljamo/libpass/v7 v7.1.0/go.mod h1:yhCvFOiJ+y1HWdSgkQQJmXUkkt0m4v9NHrfm6Z+93K8=
+github.com/eljamo/libpass/v7 v7.1.1 h1:MUauOcOMf8Zqlh538Ms0EhDoCR2Yc8z/pvYFNw2+E2A=
+github.com/eljamo/libpass/v7 v7.1.1/go.mod h1:7HNqoEuANRp3vLGNgbl92WPk/AZ1KuaeGAco9YOmcOQ=
+github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
+github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
