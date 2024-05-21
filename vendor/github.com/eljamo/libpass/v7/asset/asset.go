@@ -83,33 +83,24 @@ func getWordListFilePath(key string) (string, error) {
 // and returns the result as a slice of strings. If the file cannot be found or
 // read, an error is returned.
 func GetWordList(key string) ([]string, error) {
-	path, err := getWordListFilePath(key)
+	filePath, err := getWordListFilePath(key)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := files.ReadFile(path)
+	data, err := files.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read embedded text file (%s): %w", path, err)
+		return nil, fmt.Errorf("failed to read embedded text file (%s): %w", filePath, err)
 	}
 
 	return strings.Split(string(data), "\n"), nil
 }
 
-// GetFilteredWordList reads a word list from an embedded file identified by the
-// given key, and filters the words based on the specified minimum and maximum
-// length. It returns a slice of strings that meet the length criteria. If the
-// file cannot be opened or read, or if an error occurs during scanning, an
-// error is returned.
-func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
-	path, err := getWordListFilePath(key)
+// readAndFilterWords reads from an io.Reader, and filters the words based on the specified minimum and maximum length.
+func readAndFilterWords(filePath string, minLen int, maxLen int, fs embed.FS) ([]string, error) {
+	file, err := fs.Open(filePath)
 	if err != nil {
-		return nil, err
-	}
-
-	file, err := files.Open(path)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open embedded text file (%s): %w", filePath, err)
 	}
 	defer file.Close()
 
@@ -123,22 +114,43 @@ func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to scan reader: %w", err)
 	}
 
 	return wl, nil
+}
+
+// GetFilteredWordList reads a word list from an embedded file identified by the
+// given key, and filters the words based on the specified minimum and maximum
+// length. It returns a slice of strings that meet the length criteria. If the
+// file cannot be opened or read, or if an error occurs during scanning, an
+// error is returned.
+func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
+	filePath, err := getWordListFilePath(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return readAndFilterWords(filePath, minLen, maxLen, files)
+}
+
+func getPresetFilePath(key string) (string, error) {
+	fileName, ok := keyToFile(key, option.ConfigKeyPreset)
+	if !ok {
+		return "", fmt.Errorf("invalid %s value (%s)", option.ConfigKeyPreset, key)
+	}
+
+	return path.Join(option.ConfigKeyPreset, fileName), nil
 }
 
 // GetJSONPreset reads a JSON preset file identified by the given key from
 // embedded files. It returns the content of the JSON file as a map, if not an
 // error is returned.
 func GetJSONPreset(key string) (map[string]any, error) {
-	fileName, ok := keyToFile(key, option.ConfigKeyPreset)
-	if !ok {
-		return nil, fmt.Errorf("invalid %s value (%s)", option.ConfigKeyPreset, key)
+	filePath, err := getPresetFilePath(key)
+	if err != nil {
+		return nil, err
 	}
-
-	filePath := path.Join(option.ConfigKeyPreset, fileName)
 
 	return loadJSONFileData(filePath, files.ReadFile)
 }
