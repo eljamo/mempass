@@ -84,7 +84,7 @@ func (s *DefaultWordListService) GetWords() ([]string, error) {
 	wll := len(s.wordList)
 	wn, err := s.rngSvc.GenerateSliceWithMax(s.cfg.NumWords, wll)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to generate random word slice index numbers: %w", err)
 	}
 
 	wl := make([]string, s.cfg.NumWords)

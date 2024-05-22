@@ -43,7 +43,7 @@ func NewSeparatorService(cfg *config.Settings, rngSvc RNGService) (*DefaultSepar
 func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 	char, err := s.getSeparatorCharacter()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get separator character: %w", err)
 	}
 
 	separatedSlice := make([]string, 0, len(slice))
@@ -61,12 +61,11 @@ func (s *DefaultSeparatorService) Separate(slice []string) ([]string, error) {
 func (s *DefaultSeparatorService) getSeparatorCharacter() (string, error) {
 	if s.cfg.SeparatorCharacter == option.SeparatorCharacterRandom {
 		num, err := s.rngSvc.GenerateWithMax(len(s.cfg.SeparatorAlphabet))
-
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to generate random number for separator character: %w", err)
 		}
 
-		return string(s.cfg.SeparatorAlphabet[num]), nil
+		return s.cfg.SeparatorAlphabet[num], nil
 	}
 
 	return s.cfg.SeparatorCharacter, nil

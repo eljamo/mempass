@@ -56,12 +56,12 @@ func Execute() {
 
 func init() {
 	defaultSettings := config.DefaultSettings()
-	ccss := strings.Join(option.Presets[:], ", ")
-	pco := strings.Join(option.PaddingCharacterOptions[:], ", ")
-	sco := strings.Join(option.SeparatorCharacterOptions[:], ", ")
-	ptcss := strings.Join(option.PaddingTypes[:], ", ")
-	sccss := strings.Join(option.DefaultSpecialCharacters[:], ", ")
-	ttcss := strings.Join(option.TransformTypes[:], ", ")
+	ccss := strings.Join(option.Presets, ", ")
+	pco := strings.Join(option.PaddingCharacterOptions, ", ")
+	sco := strings.Join(option.SeparatorCharacterOptions, ", ")
+	ptcss := strings.Join(option.PaddingTypes, ", ")
+	sccss := strings.Join(option.DefaultSpecialCharacters, ", ")
+	ttcss := strings.Join(option.TransformTypes, ", ")
 	wlcss := strings.Join(option.WordLists, ", ")
 
 	// Preset and Custom Config Flags

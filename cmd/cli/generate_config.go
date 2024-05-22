@@ -29,7 +29,12 @@ func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
 	}
 
 	if presetValue == option.PresetDefault {
-		return config.New(customCfg, flagCfg)
+		cfg, err := config.New(customCfg, flagCfg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create config (%w)", err)
+		}
+
+		return cfg, nil
 	}
 
 	basePreset, err := loadBasePreset(presetValue)
@@ -37,7 +42,12 @@ func generateConfig(cmd *cobra.Command) (*config.Settings, error) {
 		return nil, err
 	}
 
-	return config.New(basePreset, customCfg, flagCfg)
+	cfg, err := config.New(basePreset, customCfg, flagCfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create config (%w)", err)
+	}
+
+	return cfg, nil
 }
 
 // Loads the base preset and the custom config from the JSON files
@@ -54,7 +64,7 @@ func loadCustomConfig(cmd *cobra.Command) (map[string]any, error) {
 func loadBasePreset(presetValue string) (map[string]any, error) {
 	basePreset, err := asset.GetJSONPreset(presetValue)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load base preset (%w)", err)
 	}
 
 	return basePreset, nil
@@ -64,7 +74,7 @@ func loadBasePreset(presetValue string) (map[string]any, error) {
 func getCustomConfigJSON(cmd *cobra.Command) (map[string]any, error) {
 	path, err := cmd.Flags().GetString(CustomConfigPathKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get custom config path (%w)", err)
 	}
 
 	customCfgJSON, err := loadCustomConfigJSON(path)
@@ -110,7 +120,12 @@ func loadCustomConfigJSON(path string) (map[string]any, error) {
 		return nil, nil
 	}
 
-	return asset.LoadJSONFile(path)
+	js, err := asset.LoadJSONFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load custom config JSON file (%w)", err)
+	}
+
+	return js, nil
 }
 
 // Returns the preset value from the custom config if it exists

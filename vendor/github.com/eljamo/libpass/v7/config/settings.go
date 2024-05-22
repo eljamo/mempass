@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/eljamo/libpass/v7/config/option"
 	"github.com/eljamo/libpass/v7/internal/merger"
@@ -44,26 +45,38 @@ type Settings struct {
 	WordList string `key:"word_list" json:"word_list,omitempty"`
 }
 
+const (
+	defaultNumPasswords            int = 3
+	defaultNumWords                int = 3
+	defaultPaddingCharactersAfter  int = 2
+	defaultPaddingCharactersBefore int = 2
+	defaultPaddingDigitsAfter      int = 2
+	defaultPaddingDigitsBefore     int = 2
+	defaultPadToLength             int = 0
+	defaultWordLengthMax           int = 8
+	defaultWordLengthMin           int = 4
+)
+
 // DefaultSettings returns a new Settings struct with the default values set.
 // This is used when no settings are given to the New function.
 func DefaultSettings() *Settings {
 	return &Settings{
 		CaseTransform:           option.CaseTransformRandom,
-		NumPasswords:            3,
-		NumWords:                3,
+		NumPasswords:            defaultNumPasswords,
+		NumWords:                defaultNumWords,
 		PaddingCharacter:        option.PaddingCharacterRandom,
-		PaddingCharactersAfter:  2,
-		PaddingCharactersBefore: 2,
-		PaddingDigitsAfter:      2,
-		PaddingDigitsBefore:     2,
+		PaddingCharactersAfter:  defaultPaddingCharactersAfter,
+		PaddingCharactersBefore: defaultPaddingCharactersBefore,
+		PaddingDigitsAfter:      defaultPaddingDigitsAfter,
+		PaddingDigitsBefore:     defaultPaddingDigitsBefore,
 		PaddingType:             option.PaddingTypeFixed,
-		PadToLength:             0,
+		PadToLength:             defaultPadToLength,
 		Preset:                  option.PresetDefault,
 		SeparatorAlphabet:       option.DefaultSpecialCharacters,
 		SeparatorCharacter:      option.SeparatorCharacterRandom,
 		SymbolAlphabet:          option.DefaultSpecialCharacters,
-		WordLengthMax:           8,
-		WordLengthMin:           4,
+		WordLengthMax:           defaultWordLengthMax,
+		WordLengthMin:           defaultWordLengthMin,
 		WordList:                option.WordListEN,
 	}
 }
@@ -71,7 +84,7 @@ func DefaultSettings() *Settings {
 func mapToJSON(m map[string]any) ([]byte, error) {
 	mj, err := json.Marshal(m)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
 	return mj, nil
@@ -85,7 +98,7 @@ func mergeMaps(ms ...map[string]any) ([]byte, error) {
 
 func jsonToSettings(s *Settings, js []byte) error {
 	if err := json.Unmarshal(js, &s); err != nil {
-		return err
+		return fmt.Errorf("failed to unmarshal JSON: %w", err)
 	}
 
 	return nil
