@@ -5,6 +5,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"strings"
@@ -14,6 +15,7 @@ import (
 
 //go:embed preset/* word_list/*
 var files embed.FS
+
 var fileMap = map[string]map[string]string{
 	option.ConfigKeyPreset: {
 		option.PresetAppleID:       "appleid.json",
@@ -102,7 +104,11 @@ func readAndFilterWords(filePath string, minLen int, maxLen int, fs embed.FS) ([
 	if err != nil {
 		return nil, fmt.Errorf("failed to open embedded text file (%s): %w", filePath, err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("failed to close file (%s): %v", filePath, err)
+		}
+	}()
 
 	var wl []string
 	scanner := bufio.NewScanner(file)

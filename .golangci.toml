@@ -1,0 +1,54 @@
+[run]
+timeout = "300s"
+
+[[output.formats]]
+format = "colored-line-number"
+
+[linters]
+enable = [
+    # Default
+    "errcheck",    # https://golangci-lint.run/usage/linters/#errcheck
+    "gosimple",    # https://golangci-lint.run/usage/linters/#gosimple
+    "govet",       # https://golangci-lint.run/usage/linters/#govet
+    "ineffassign", # https://golangci-lint.run/usage/linters/#ineffassign
+    "staticcheck", # https://golangci-lint.run/usage/linters/#staticcheck
+    "unused",      # https://golangci-lint.run/usage/linters/#unused
+
+    # Custom
+    "errchkjson",    # https://golangci-lint.run/usage/linters/#errchkjson
+    "gci",           # https://golangci-lint.run/usage/linters/#gci
+    "gocritic",      # https://golangci-lint.run/usage/linters/#gocritic
+    "gocognit",      # https://golangci-lint.run/usage/linters/#gocognit
+    "goconst",       # https://golangci-lint.run/usage/linters/#goconst
+    "gocyclo",       # https://golangci-lint.run/usage/linters/#gocyclo
+    "gofumpt",       # https://golangci-lint.run/usage/linters/#gofumpt
+    "goimports",     # https://golangci-lint.run/usage/linters/#goimports
+    "maintidx",      # https://golangci-lint.run/usage/linters/#maintidx
+    "misspell",      # https://golangci-lint.run/usage/linters/#misspell
+    "mnd",           # https://golangci-lint.run/usage/linters/#mnd
+    "nakedret",      # https://golangci-lint.run/usage/linters/#nakedret
+    "prealloc",      # https://golangci-lint.run/usage/linters/#prealloc
+    "revive",        # https://golangci-lint.run/usage/linters/#revive
+    "thelper",       # https://golangci-lint.run/usage/linters/#thelper
+    "tparallel",     # tparallel detects inappropriate usage of t.Parallel() method in your Go test codes.
+    "usestdlibvars", # https://golangci-lint.run/usage/linters/#usestdlibvars
+    "unconvert",     # https://golangci-lint.run/usage/linters/#unconvert
+    "unparam",       # https://golangci-lint.run/usage/linters/#unparam
+    "wrapcheck",     # https://golangci-lint.run/usage/linters/#wrapcheck
+]
+
+[issues]
+exclude-use-default = false
+
+[[linters-settings.revive.rules]]
+name = "package-comments"
+disabled = true
+
+[linters-settings.wrapcheck]
+ignorePackageGlobs = ["github.com/eljamo/mempass/*"]
+
+[linters-settings.gocyclo]
+min-complexity = 15
+
+[linters-settings.gocognit]
+min-complexity = 15

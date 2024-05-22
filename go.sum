@@ -1,6 +1,6 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/eljamo/libpass/v7 v7.1.1 h1:MUauOcOMf8Zqlh538Ms0EhDoCR2Yc8z/pvYFNw2+E2A=
-github.com/eljamo/libpass/v7 v7.1.1/go.mod h1:7HNqoEuANRp3vLGNgbl92WPk/AZ1KuaeGAco9YOmcOQ=
+github.com/eljamo/libpass/v7 v7.1.2 h1:9aiUaIHN122iOdkqW/pd0yjP+Q/Gjx4wF3iD05L/pNI=
+github.com/eljamo/libpass/v7 v7.1.2/go.mod h1:7HNqoEuANRp3vLGNgbl92WPk/AZ1KuaeGAco9YOmcOQ=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=

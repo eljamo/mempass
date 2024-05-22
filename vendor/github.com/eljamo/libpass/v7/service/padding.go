@@ -68,7 +68,7 @@ func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 	paddedSlice := make([]string, 0, s.cfg.PaddingDigitsBefore+len(slice)+s.cfg.PaddingDigitsAfter)
 	rdb, err := s.generateRandomDigits(s.cfg.PaddingDigitsBefore)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to generate random digits before: %w", err)
 	}
 
 	paddedSlice = append(paddedSlice, rdb...)
@@ -76,7 +76,7 @@ func (s *DefaultPaddingService) digits(slice []string) ([]string, error) {
 
 	rda, err := s.generateRandomDigits(s.cfg.PaddingDigitsAfter)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to generate random digits after: %w", err)
 	}
 
 	paddedSlice = append(paddedSlice, rda...)
@@ -150,7 +150,7 @@ func (s *DefaultPaddingService) removeRandomEdgeSeparatorCharacter(slice []strin
 func (s *DefaultPaddingService) symbols(pw string) (string, error) {
 	char, err := s.getPaddingCharacter()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to get padding character: %w", err)
 	}
 
 	switch s.cfg.PaddingType {
@@ -173,7 +173,7 @@ func (s *DefaultPaddingService) getPaddingCharacter() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return string(s.cfg.SymbolAlphabet[num]), nil
+		return s.cfg.SymbolAlphabet[num], nil
 	}
 
 	return s.cfg.PaddingCharacter, nil

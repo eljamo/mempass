@@ -112,7 +112,7 @@ func (s *DefaultTransformerService) alternate(slice []string) []string {
 //
 // Example Output: string[]{"hElLo", "WoRlD"}, nil
 func (s *DefaultTransformerService) alternateLettercase(slice []string) ([]string, error) {
-	var result []string
+	result := make([]string, 0, len(slice))
 	for _, str := range slice {
 		var sb strings.Builder
 		upper := false
@@ -128,7 +128,7 @@ func (s *DefaultTransformerService) alternateLettercase(slice []string) ([]strin
 			}
 			_, err = sb.WriteRune(r)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to write rune to string builder: %w", err)
 			}
 		}
 		result = append(result, sb.String())
@@ -153,7 +153,7 @@ func (s *DefaultTransformerService) capitalise(slice []string) []string {
 
 // Inverts the casing of a capitialised string in the slice
 //
-// Exmaple output: string[]{"hELLO", "wORLD"}, nil
+// Example output: string[]{"hELLO", "wORLD"}, nil
 func (s *DefaultTransformerService) capitaliseInvert(slice []string) ([]string, error) {
 	for i, w := range slice {
 		var sb strings.Builder
@@ -161,12 +161,12 @@ func (s *DefaultTransformerService) capitaliseInvert(slice []string) ([]string, 
 			if j == 0 {
 				_, err := sb.WriteRune(unicode.ToLower(r))
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("failed to write rune to string builder: %w", err)
 				}
 			} else {
 				_, err := sb.WriteRune(unicode.ToUpper(r))
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("failed to write rune to string builder: %w", err)
 				}
 			}
 		}
@@ -197,19 +197,19 @@ func isVowel(r rune) bool {
 //
 // Example Output: string[]{"hEllO", "wOrld"}, nil
 func (s *DefaultTransformerService) lowerVowelUpperConsonant(slice []string) ([]string, error) {
-	var result []string
+	result := make([]string, 0, len(slice))
 	for _, str := range slice {
 		var sb strings.Builder
 		for _, r := range str {
 			if isVowel(r) {
 				_, err := sb.WriteRune(unicode.ToLower(r))
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("failed to write rune to string builder: %w", err)
 				}
 			} else {
 				_, err := sb.WriteRune(unicode.ToUpper(r))
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("failed to write rune to string builder: %w", err)
 				}
 			}
 		}
@@ -223,7 +223,7 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 	for i, w := range slice {
 		r, err := s.rngSvc.Generate()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to generate random number for random case: %w", err)
 		}
 
 		if r%2 == 0 {
