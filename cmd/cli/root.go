@@ -42,7 +42,7 @@ func runRootCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, p := range pws {
-		fmt.Println(p)
+		cmd.Println(p)
 	}
 
 	return nil
