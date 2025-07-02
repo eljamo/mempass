@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -44,6 +45,13 @@ var fileMap = map[string]map[string]string{
 	},
 }
 
+var (
+	ErrReadFile        = errors.New("failed to read file")
+	ErrJSON            = errors.New("invalid JSON content")
+	ErrInvalidWordList = errors.New("invalid word list")
+	ErrInvalidPreset   = errors.New("invalid preset")
+)
+
 func keyToFile(key, fileType string) (string, bool) {
 	file, ok := fileMap[fileType][strings.ToUpper(key)]
 
@@ -53,12 +61,12 @@ func keyToFile(key, fileType string) (string, bool) {
 func loadJSONFileData(filePath string, readerFunc func(string) ([]byte, error)) (map[string]any, error) {
 	data, err := readerFunc(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file (%s): %w", filePath, err)
+		return nil, errors.Join(ErrReadFile, fmt.Errorf("error reading file (%s): %w", filePath, err))
 	}
 
 	var jmap map[string]any
 	if err := json.Unmarshal(data, &jmap); err != nil {
-		return nil, fmt.Errorf("invalid JSON content in (%s): %w", filePath, err)
+		return nil, errors.Join(ErrJSON, fmt.Errorf("error unmarshaling JSON (%s): %w", filePath, err))
 	}
 
 	return jmap, nil
@@ -74,7 +82,7 @@ func LoadJSONFile(filePath string) (map[string]any, error) {
 func getWordListFilePath(key string) (string, error) {
 	fileName, ok := keyToFile(key, option.ConfigKeyWordList)
 	if !ok {
-		return "", fmt.Errorf("invalid %s value (%s)", option.ConfigKeyWordList, key)
+		return "", errors.Join(ErrInvalidWordList, fmt.Errorf("invalid %s value (%s)", option.ConfigKeyWordList, key))
 	}
 
 	return path.Join(option.ConfigKeyWordList, fileName), nil
@@ -92,7 +100,7 @@ func GetWordList(key string) ([]string, error) {
 
 	data, err := files.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read embedded text file (%s): %w", filePath, err)
+		return nil, errors.Join(ErrReadFile, fmt.Errorf("failed to read embedded text file (%s): %w", filePath, err))
 	}
 
 	return strings.Split(string(data), "\n"), nil
@@ -102,7 +110,7 @@ func GetWordList(key string) ([]string, error) {
 func readAndFilterWords(filePath string, minLen int, maxLen int, fs embed.FS) ([]string, error) {
 	file, err := fs.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open embedded text file (%s): %w", filePath, err)
+		return nil, errors.Join(ErrReadFile, fmt.Errorf("failed to open embedded text file (%s): %w", filePath, err))
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -120,7 +128,7 @@ func readAndFilterWords(filePath string, minLen int, maxLen int, fs embed.FS) ([
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("failed to scan reader: %w", err)
+		return nil, errors.Join(ErrReadFile, fmt.Errorf("failed to scan embedded text file (%s): %w", filePath, err))
 	}
 
 	return wl, nil
@@ -143,7 +151,7 @@ func GetFilteredWordList(key string, minLen int, maxLen int) ([]string, error) {
 func getPresetFilePath(key string) (string, error) {
 	fileName, ok := keyToFile(key, option.ConfigKeyPreset)
 	if !ok {
-		return "", fmt.Errorf("invalid %s value (%s)", option.ConfigKeyPreset, key)
+		return "", errors.Join(ErrInvalidPreset, fmt.Errorf("invalid %s value (%s)", option.ConfigKeyPreset, key))
 	}
 
 	return path.Join(option.ConfigKeyPreset, fileName), nil

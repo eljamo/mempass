@@ -219,11 +219,35 @@ func (s *DefaultTransformerService) lowerVowelUpperConsonant(slice []string) ([]
 	return result, nil
 }
 
-func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
+// isUpper checks if all characters in a string are uppercase.
+func isUpper(s string) bool {
+	for _, r := range s {
+		if unicode.IsLetter(r) && !unicode.IsUpper(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// isLower checks if all characters in a string are lowercase.
+func isLower(s string) bool {
+	for _, r := range s {
+		if unicode.IsLetter(r) && !unicode.IsLower(r) {
+			return false
+		}
+	}
+	return true
+}
+
+func (s *DefaultTransformerService) applyRandomCasing(slice []string) error {
+	if len(slice) == 0 {
+		return nil
+	}
+
 	for i, w := range slice {
 		r, err := s.rngSvc.Generate()
 		if err != nil {
-			return nil, fmt.Errorf("failed to generate random number for random case: %w", err)
+			return fmt.Errorf("failed to generate random number for random case: %w", err)
 		}
 
 		if r%2 == 0 {
@@ -231,6 +255,62 @@ func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
 		} else {
 			slice[i] = strings.ToLower(w)
 		}
+	}
+	return nil
+}
+
+func (s *DefaultTransformerService) ensureMixedCasing(slice []string) error {
+	if len(slice) == 0 {
+		return nil
+	}
+
+	hasUpper := false
+	hasLower := false
+
+	for _, w := range slice {
+		if isUpper(w) {
+			hasUpper = true
+		}
+		if isLower(w) {
+			hasLower = true
+		}
+	}
+
+	if !hasUpper || !hasLower {
+		r, err := s.rngSvc.Generate()
+		if err != nil {
+			return fmt.Errorf("failed to generate random number for random case adjustment: %w", err)
+		}
+
+		randomIndex := r % len(slice)
+
+		if !hasUpper {
+			slice[randomIndex] = strings.ToUpper(slice[randomIndex])
+		} else if !hasLower {
+			slice[randomIndex] = strings.ToLower(slice[randomIndex])
+		}
+	}
+
+	return nil
+}
+
+// random applies random casing to each element of the slice. But ensures that
+// the slice contains at least one uppercase and lowercase word
+//
+// Example Output: string[]{"hello", "WORLD"}
+func (s *DefaultTransformerService) random(slice []string) ([]string, error) {
+	if len(slice) == 0 {
+		return slice, nil // Return the empty slice directly
+	}
+
+	// Apply random casing to the slice
+	if err := s.applyRandomCasing(slice); err != nil {
+		return nil, err
+	}
+
+	// Ensure the slice has both uppercase and lowercase words
+	if err := s.ensureMixedCasing(slice); err != nil {
+		return nil, err
 	}
 
 	return slice, nil

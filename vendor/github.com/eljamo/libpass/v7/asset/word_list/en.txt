@@ -2363,7 +2363,6 @@ clustered
 clusters
 clutch
 clutter
-cnet
 coach
 coaches
 coaching
@@ -5460,7 +5459,6 @@ gauntlet
 gauze
 gave
 gawk
-gays
 gazette
 gazing
 gear
@@ -11517,9 +11515,6 @@ severe
 severely
 severity
 sewing
-sexual
-sexuality
-sexually
 shabby
 shack
 shade
@@ -13355,8 +13350,6 @@ transaction
 transactions
 transcript
 transcripts
-transexual
-transexuales
 transfer
 transferred
 transfers
@@ -13376,7 +13369,6 @@ transparent
 transpire
 transport
 transpose
-transsexual
 trap
 trapdoor
 trapeze
@@ -13816,7 +13808,6 @@ unions
 uniprotkb
 unique
 uniquely
-unisexual
 unison
 unissued
 unit

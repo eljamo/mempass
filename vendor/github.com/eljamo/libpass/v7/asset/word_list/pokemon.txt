@@ -1421,7 +1421,6 @@ clue
 clumsy
 cluster
 clydesdale
-co.uk
 coach
 coaching
 coal
@@ -3469,7 +3468,6 @@ guitarist
 gulf
 gull
 gulp
-gulp.js
 gulpin
 gulping
 gumshoe
@@ -4099,8 +4097,6 @@ journey
 journeys
 joycon
 joyful
-jquery
-jr.
 juan
 jubilife
 judge
@@ -5081,7 +5077,6 @@ movie
 moving
 mow
 moxie
-mr.
 much
 muck
 mucus
@@ -5882,7 +5877,6 @@ pokefan
 pokefans
 pokegear
 pokejungle
-pokejungle.net
 pokemaniac
 pokemaster
 pokeminers
@@ -6712,8 +6706,6 @@ rusty
 ryme
 ryou
 ryter
-s.a.w.s
-s.o.s
 sable
 sablenite
 sableye
@@ -7410,8 +7402,6 @@ southern
 southwest
 souvenir
 sower
-sp.atk
-sp.def
 space
 spacial
 spacious

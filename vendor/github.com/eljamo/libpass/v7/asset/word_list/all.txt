@@ -7662,8 +7662,6 @@ cluttered
 clyde
 clydesdale
 clysm
-cnet
-co.uk
 coach
 coaches
 coaching
@@ -16805,8 +16803,6 @@ gawk
 gawking
 gaxxa
 gaxxan
-gay
-gays
 gaze
 gazed
 gazer
@@ -18228,7 +18224,6 @@ gulliver
 gulls
 gully
 gulp
-gulp.js
 gulper
 gulpin
 gulping
@@ -22165,7 +22160,6 @@ joytoy
 jpeg
 jpg
 jquery
-jr.
 jrade
 jrrvf
 jrul
@@ -27377,7 +27371,6 @@ mozrog
 mozzarella
 mpeg
 mpegs
-mr.
 mrlak
 mrlakenstein
 mrna
@@ -28799,7 +28792,6 @@ nyrians
 nysillin
 nyssa
 nytram
-o.w.l
 oak
 oakensheild
 oakenshield
@@ -31547,7 +31539,6 @@ pokefan
 pokefans
 pokegear
 pokejungle
-pokejungle.net
 pokemaniac
 pokemaster
 pokeminers
@@ -33401,7 +33392,6 @@ rants
 ranugad
 ranzar
 rapacc
-raped
 raphael
 raphale
 rapid
@@ -35792,8 +35782,6 @@ ryter
 ryusaki
 ryza
 ryzt
-s.a.w.s
-s.o.s
 saadul
 saan
 saar
@@ -37088,9 +37076,6 @@ sewers
 sewing
 sewn
 sews
-sexual
-sexuality
-sexually
 seyetik
 seymour
 seyugi
@@ -38937,8 +38922,6 @@ sowerbutts
 sowing
 sown
 soybean
-sp.atk
-sp.def
 spa
 space
 spaceballs
@@ -41580,7 +41563,6 @@ telepathy
 telephone
 telephony
 teleplays
-teleporno
 teleport
 teleported
 teleporter
@@ -42885,8 +42867,6 @@ transclusion
 transcribing
 transcript
 transcripts
-transexual
-transexuales
 transfer
 transference
 transferred
@@ -42946,7 +42926,6 @@ transporter
 transporting
 transports
 transpose
-transsexual
 transylvania
 trant
 tranter
@@ -44139,7 +44118,6 @@ unions
 uniprotkb
 unique
 uniquely
-unisexual
 unison
 unissued
 unit
