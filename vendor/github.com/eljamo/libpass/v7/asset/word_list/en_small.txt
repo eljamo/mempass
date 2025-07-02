@@ -1489,7 +1489,6 @@ club
 clubs
 cluster
 clusters
-cnet
 coach
 coaches
 coaching
@@ -3303,7 +3302,6 @@ gathered
 gathering
 gauge
 gave
-gays
 gazette
 gear
 geek
@@ -6970,9 +6968,6 @@ seventh
 several
 severe
 sewing
-sexual
-sexuality
-sexually
 shade
 shades
 shadow
@@ -7978,8 +7973,6 @@ transaction
 transactions
 transcript
 transcripts
-transexual
-transexuales
 transfer
 transferred
 transfers
@@ -7997,7 +7990,6 @@ transmitted
 transparency
 transparent
 transport
-transsexual
 trap
 trash
 trauma

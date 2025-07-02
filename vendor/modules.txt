@@ -1,5 +1,5 @@
-# github.com/eljamo/libpass/v7 v7.1.2
-## explicit; go 1.22.3
+# github.com/eljamo/libpass/v7 v7.2.0
+## explicit; go 1.23.0
 github.com/eljamo/libpass/v7/asset
 github.com/eljamo/libpass/v7/config
 github.com/eljamo/libpass/v7/config/option
@@ -9,14 +9,14 @@ github.com/eljamo/libpass/v7/service
 # github.com/inconshreveable/mousetrap v1.1.0
 ## explicit; go 1.18
 github.com/inconshreveable/mousetrap
-# github.com/spf13/cobra v1.8.1
+# github.com/spf13/cobra v1.9.1
 ## explicit; go 1.15
 github.com/spf13/cobra
-# github.com/spf13/pflag v1.0.5
+# github.com/spf13/pflag v1.0.6
 ## explicit; go 1.12
 github.com/spf13/pflag
-# golang.org/x/text v0.16.0
-## explicit; go 1.18
+# golang.org/x/text v0.26.0
+## explicit; go 1.23.0
 golang.org/x/text/cases
 golang.org/x/text/internal
 golang.org/x/text/internal/language

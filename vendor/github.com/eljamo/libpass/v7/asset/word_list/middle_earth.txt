@@ -5990,7 +5990,6 @@ gaunt
 gauntlets
 gaurwaith
 gave
-gay
 gaze
 gazed
 gazing
@@ -13504,7 +13503,6 @@ telcontar
 telem
 telemnar
 telephone
-teleporno
 teler
 teleri
 telerin

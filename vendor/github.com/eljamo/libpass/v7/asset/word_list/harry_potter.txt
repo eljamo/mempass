@@ -633,7 +633,6 @@ artwork
 ascending
 ascensions
 asceticism
-asexual
 ashamed
 ashe
 ashes
@@ -7499,7 +7498,6 @@ nuttley
 nuturing
 nymphadora
 nynorsk
-o.w.l
 oapley
 oath
 obedience
@@ -9914,8 +9912,6 @@ severity
 severus
 sewer
 sewers
-sexual
-sexually
 shabby
 shack
 shacklebolt
