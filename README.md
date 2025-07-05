@@ -1,6 +1,6 @@
 # mempass
 
-A memorable password generator, a CLI version of xkpasswd.net written in Go. This tool uses [libpass](https://github.com/eljamo/libpass) to generate passwords
+A memorable password generator, a CLI version of [xkpasswd.net](https://www.xkpasswd.net) written in Go. This tool uses [libpass](https://github.com/eljamo/libpass) to generate passwords
 
 ## Install
 
