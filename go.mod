@@ -1,8 +1,6 @@
 module github.com/eljamo/mempass
 
-go 1.23.0
-
-toolchain go1.24.4
+go 1.24.4
 
 require (
 	github.com/eljamo/libpass/v7 v7.2.0
