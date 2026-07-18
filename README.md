@@ -27,28 +27,29 @@ Flags:
       --num_words int                   number of words, valid values: 2+ (default 3)
       --pad_to_length int               length to pad the password to, will be ignored if less than the generated password length, valid values: 0+
       --padding_character string        character to pad the password with, example values: RANDOM, !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ; (default "RANDOM")
-      --padding_characters_after int    number of characters to pad before the password, valid values: 0+ (default 2)
+      --padding_characters_after int    number of characters to pad after the password, valid values: 0+ (default 2)
       --padding_characters_before int   number of characters to pad before the password, valid values: 0+ (default 2)
-      --padding_digits_after int        number of digits to pad before the password, valid values: 0+ (default 2)
+      --padding_digits_after int        number of digits to pad after the password, valid values: 0+ (default 2)
       --padding_digits_before int       number of digits to pad before the password, valid values: 0+ (default 2)
       --padding_type string             padding type, allowed values: ADAPTIVE, FIXED, NONE (default "FIXED")
       --preset string                   use a built-in preset. Valid values: DEFAULT, APPLEID, NTLM, SECURITYQ, WEB16, WEB16_XKPASSWD, WEB32, WIFI, XKCD, XKCD_XKPASSWD (default "DEFAULT")
+      --score                           show a zxcvbn strength score next to each password, e.g. [4/4 very strong]
       --separator_alphabet strings      comma-separated list of characters to separate password parts, example values: !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ;
       --separator_character string      character to separate password parts, example values: RANDOM, !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ; (default "RANDOM")
       --symbol_alphabet strings         comma-separated list of characters to pad the password with, example values: !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ;
   -v, --version                         version for mempass
       --word_length_max int             maximum word length, valid values: 1+ (default 8)
       --word_length_min int             minimum word length, valid values: 1+ (default 4)
-      --word_list string                use a built-in list of words. Valid values: ALL, DOCTOR_WHO, EN, EN_SMALL, GAME_OF_THRONES, HARRY_POTTER, MIDDLE_EARTH, STAR_TREK, STAR_WARS (default "EN")
+      --word_list string                use a built-in list of words. Valid values: 40K, ALL, DOCTOR_WHO, EN, EN_SMALL, GAME_OF_THRONES, HARRY_POTTER, MIDDLE_EARTH, POKEMON, STAR_TREK, STAR_WARS, SUNBORN (default "EN")
 ```
 
 ### Using the built-in default preset
 
 ```
 ~ $ mempass
-**46=walter=agents=doctrine=65**
-;;57.WILDLIFE.aspect.HYBRID.41;;
-..51!INQUIRY!WINSTON!singer!26..
+;;06%ride%GLUTEN%INPUTS%47;;
+..86%INDICATE%SLAW%reabsorb%15..
+--23!UNTAXED!decades!vertex!20--
 ```
 
 ### Using a custom config generated on xkpasswd.net
@@ -60,29 +61,38 @@ warriors-CASTING-ROSTER-RELEVANT-04&
 REFINED-triumph-WEST-MARVEL-03$
 ```
 
+### Show a strength score for each password
+
+```
+~ $ mempass --score
+**57&TONES&stammer&kelkoo&87**    [4/4 very strong]
+??80&preserve&UNPAID&HEADER&70??  [4/4 very strong]
+--88+reward+LIONS+WRECKING+88--   [4/4 very strong]
+```
+
 ### Using the built-in XKCD preset
 
 ```
 ~ $ mempass --preset XKCD
-ROSE-EPINIONS-SPEEDS-putting-76_
-enabled-pleasure-convert-poor-61_
-caring-COUNSEL-DISH-spectrum-31|
+crispy-VERIFIED-MANGLE-award-46@
+DUSK-rivers-support-encoding-49|
+UNICORN-PROWLING-baffle-PASTOR-40^
 ```
 
 ### Using the built-in XKCD preset to generate 10 passwords
 
 ```
 ~ $ mempass --preset XKCD --num_passwords 10
-MASON-mailman-velvet-came-07_
-CLOSURE-COLOUR-sons-mart-97~
-JUNGLE-DRUM-HOURLY-ANAHEIM-84.
-MOMS-plasma-tackle-UNIX-21+
-YOUNG-PARK-took-babes-69!
-backed-burden-SURVIVE-EMPIRE-48-
-RECOVER-WIFI-feeding-tigers-84+
-deliver-nicholas-flower-JULIAN-94_
-wires-neon-MSGID-evil-88_
-winners-tion-provider-BEVERLY-62$
+jersey-RICHLY-upstage-shaped-41?
+UPSTREAM-CAROLINE-DESPISE-morbidly-23|
+appease-blush-COLONISE-DEFAULT-58+
+WRITERS-ware-pride-ROPELIKE-11;
+saloon-MAMA-thomas-DUBBED-57.
+SECOND-encode-town-WINDMILL-15@
+GLASS-PLEDGE-DOUGLAS-defame-03+
+away-ENVIABLY-HIRING-UNFITTED-73?
+FLAGSHIP-bargraph-baboon-expand-06|
+classes-tiger-REAR-beer-36@
 ```
 
 ### Using the built-in XKCD preset to generate passwords with 10 words in them
@@ -99,17 +109,17 @@ WALKING-advanced-MUSLIM-review-KNOW-hughes-spas-PHYS-FARM-GOSSIP-12=
 ```
 ~ $ mempass --preset XKCD --word_list MIDDLE_EARTH
 LEGOLAS-SPEAKS-clinking-anigh-79%
-CAIRN-CLOSED-CLOUD-TOMB-70@
-thudding-spotted-legends-TEMPERS-99?
+lowlands-liable-ARCHIVE-QUIVERED-61&
+ADVANCE-readily-AMROD-occupied-82%
 ```
 
 ### Using the built-in WEB32 preset to generate passwords and pad them to length of 32 characters
 
 ```
 ~ $ mempass --preset WEB32 --padding_type ADAPTIVE --pad_to_length 32
-51,tions,PAINT,bush,NONE,18!!!!!
-52_mill_BRAS_talks_DONNA_93|||||
-07,costa,DANCE,shine,BLINK,37:::
+74|owned|ELDER|hear|CROWD|91++++
+93=andy=FEVER=stem=FORK=23&&&&&&
+44-pins-MUSHY-packs-MODES-46!!!!
 ```
 
 ## Development

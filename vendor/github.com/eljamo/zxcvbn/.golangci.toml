@@ -1,0 +1,65 @@
+version = '2'
+
+[linters]
+enable = [
+  'gocritic',
+  'maintidx',
+  'misspell',
+  'nakedret',
+  'revive',
+  'thelper',
+  'tparallel',
+  'unconvert',
+  'unparam',
+  'usestdlibvars',
+  'wrapcheck'
+]
+disable = [
+  'unused'
+]
+
+[linters.settings]
+[linters.settings.gocognit]
+min-complexity = 15
+
+[linters.settings.gocyclo]
+min-complexity = 15
+
+[linters.settings.mnd]
+ignored-files = [
+  'example/*'
+]
+
+[linters.settings.revive]
+[[linters.settings.revive.rules]]
+name = 'package-comments'
+disabled = true
+
+[linters.settings.wrapcheck]
+ignore-package-globs = [
+  'github.com/eljamo/weightedoption/*'
+]
+
+[linters.exclusions]
+generated = 'lax'
+paths = [
+  'third_party$',
+  'builtin$',
+  'examples$',
+  '_test.go$'
+]
+
+[formatters]
+enable = [
+  'gci',
+  'gofumpt',
+  'goimports'
+]
+
+[formatters.exclusions]
+generated = 'lax'
+paths = [
+  'third_party$',
+  'builtin$',
+  'examples$'
+]

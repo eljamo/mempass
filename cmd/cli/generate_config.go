@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	"github.com/eljamo/libpass/v7/asset"
-	"github.com/eljamo/libpass/v7/config"
-	"github.com/eljamo/libpass/v7/config/option"
+	"github.com/eljamo/libpass/v8/asset"
+	"github.com/eljamo/libpass/v8/config"
+	"github.com/eljamo/libpass/v8/config/option"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -85,6 +85,13 @@ func getCustomConfigJSON(cmd *cobra.Command) (map[string]any, error) {
 	return customCfgJSON, nil
 }
 
+// CLI-only flags which must not be passed to libpass as config, it rejects
+// JSON containing unknown fields
+var nonConfigFlagKeys = map[string]struct{}{
+	customConfigPathKey: {},
+	scoreKey:            {},
+}
+
 // Returns a map of the cmd flags and their values
 func getCmdFlags(cmd *cobra.Command) (map[string]any, error) {
 	flags := make(map[string]any)
@@ -92,6 +99,10 @@ func getCmdFlags(cmd *cobra.Command) (map[string]any, error) {
 	var err error
 	cmd.Flags().Visit(func(flag *pflag.Flag) {
 		if err != nil {
+			return
+		}
+
+		if _, ok := nonConfigFlagKeys[flag.Name]; ok {
 			return
 		}
 

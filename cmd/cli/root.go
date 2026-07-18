@@ -5,16 +5,19 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eljamo/libpass/v7/config"
-	"github.com/eljamo/libpass/v7/config/option"
-	"github.com/eljamo/libpass/v7/service"
+	"github.com/eljamo/libpass/v8/config"
+	"github.com/eljamo/libpass/v8/config/option"
+	"github.com/eljamo/libpass/v8/service"
 	"github.com/spf13/cobra"
 )
 
-const version string = "1.14.0"
+const version string = "1.15.0"
 
 // Constant for the custom config path key
 const customConfigPathKey string = "custom_config_path"
+
+// Constant for the score flag key
+const scoreKey string = "score"
 
 var rootCmd = &cobra.Command{
 	Use:          "mempass",
@@ -41,6 +44,15 @@ func runRootCmd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to generate passwords: %w", err)
 	}
 
+	showScore, err := cmd.Flags().GetBool(scoreKey)
+	if err != nil {
+		return fmt.Errorf("failed to get score flag: %w", err)
+	}
+
+	if showScore {
+		pws = formatScoredPasswords(pws)
+	}
+
 	for _, p := range pws {
 		cmd.Println(p)
 	}
@@ -63,6 +75,13 @@ func init() {
 	sccss := strings.Join(option.DefaultSpecialCharacters, ", ")
 	ttcss := strings.Join(option.TransformTypes, ", ")
 	wlcss := strings.Join(option.WordLists, ", ")
+
+	// Output Flags
+	rootCmd.Flags().Bool(
+		scoreKey,
+		false,
+		"show a zxcvbn strength score next to each password, e.g. [4/4 very strong]",
+	)
 
 	// Preset and Custom Config Flags
 	rootCmd.Flags().String(
