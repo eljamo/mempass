@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version string = "1.15.0"
+const version string = "1.16.1"
 
 // Constant for the custom config path key
 const customConfigPathKey string = "custom_config_path"
