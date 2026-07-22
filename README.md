@@ -33,7 +33,7 @@ Flags:
       --padding_digits_before int       number of digits to pad before the password, valid values: 0+ (default 2)
       --padding_type string             padding type, allowed values: ADAPTIVE, FIXED, NONE (default "FIXED")
       --preset string                   use a built-in preset. Valid values: DEFAULT, APPLEID, NTLM, SECURITYQ, WEB16, WEB16_XKPASSWD, WEB32, WIFI, XKCD, XKCD_XKPASSWD (default "DEFAULT")
-      --score                           show a zxcvbn strength score next to each password, e.g. [4/4 very strong]
+      --score                           show throttled/unthrottled zxcvbn strength scores next to each password, e.g. (Throttled [4/4, Very Strong], Unthrottled [2/4, Fair])
       --separator_alphabet strings      comma-separated list of characters to separate password parts, example values: !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ;
       --separator_character string      character to separate password parts, example values: RANDOM, !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ; (default "RANDOM")
       --symbol_alphabet strings         comma-separated list of characters to pad the password with, example values: !, @, $, %, ^, &, *, -, +, =, :, |, ~, ?, /, ., ;
@@ -65,9 +65,9 @@ REFINED-triumph-WEST-MARVEL-03$
 
 ```
 ~ $ mempass --score
-**57&TONES&stammer&kelkoo&87**    [4/4 very strong]
-??80&preserve&UNPAID&HEADER&70??  [4/4 very strong]
---88+reward+LIONS+WRECKING+88--   [4/4 very strong]
+%%07=pronto=deserve=WALRUS=82%%    (Throttled: [4/4, Very Strong], Unthrottled: [4/4, Very Strong])
+$$64&WISDOM&GMBH&poster&69$$       (Throttled: [4/4, Very Strong], Unthrottled: [4/4, Very Strong])
+//22~classic~arrange~CLUBBED~61//  (Throttled: [4/4, Very Strong], Unthrottled: [4/4, Very Strong])
 ```
 
 ### Using the built-in XKCD preset

@@ -49,11 +49,14 @@ func runRootCmd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get score flag: %w", err)
 	}
 
-	if showScore {
-		pws = formatScoredPasswords(pws)
+	lines, warning := evaluatePasswords(pws, showScore)
+
+	if warning != "" {
+		cmd.PrintErrln(warning)
+		cmd.PrintErrln()
 	}
 
-	for _, p := range pws {
+	for _, p := range lines {
 		cmd.Println(p)
 	}
 
@@ -80,7 +83,8 @@ func init() {
 	rootCmd.Flags().Bool(
 		scoreKey,
 		false,
-		"show a zxcvbn strength score next to each password, e.g. [4/4 very strong]",
+		"show throttled/unthrottled zxcvbn strength scores next to each password, e.g. "+
+			"(Throttled [4/4, Very Strong], Unthrottled [2/4, Fair])",
 	)
 
 	// Preset and Custom Config Flags
@@ -92,7 +96,13 @@ func init() {
 	rootCmd.Flags().String(
 		option.ConfigKeyPreset,
 		defaultSettings.Preset,
-		fmt.Sprintf("use a built-in preset. Valid values: %s", ccss),
+		fmt.Sprintf(
+			"use a built-in preset. Valid values: %s. Note: ntlm and web16 trade password "+
+				"strength for a short, legacy-compatible length and can be broken almost "+
+				"instantly by an attacker cracking a leaked hash offline (see --score); "+
+				"prefer a longer preset unless that length limit applies to you",
+			ccss,
+		),
 	)
 
 	// Word List Flags

@@ -5,8 +5,8 @@ github.com/dlclark/regexp2 v1.12.0 h1:0j4c5qQmnC6XOWNjP3PIXURXN2gWx76rd3KvgdPkCz
 github.com/dlclark/regexp2 v1.12.0/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/eljamo/libpass/v8 v8.0.2 h1:mr7Le+k6EcgplkrTJ/Yp1rH8qqI98YJI+N+kGktxJDE=
 github.com/eljamo/libpass/v8 v8.0.2/go.mod h1:2bWvbHSKNr37bOQSvo42AuW6hIi0tw61HXk6PE2RsP4=
-github.com/eljamo/zxcvbn v1.0.0 h1:aln8Ycb01hh6eYNjFAp//hwhCxmBjYjz17DS+XcJb6k=
-github.com/eljamo/zxcvbn v1.0.0/go.mod h1:0YXB9Sc4oQ+JQntfj+GpgUhEnNInS+sC6iw/3NSRTFI=
+github.com/eljamo/zxcvbn v1.1.0 h1:54nxJcad987bGu86w7pJ7GATNHowQEQPan5Oo0kUnPg=
+github.com/eljamo/zxcvbn v1.1.0/go.mod h1:0YXB9Sc4oQ+JQntfj+GpgUhEnNInS+sC6iw/3NSRTFI=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=

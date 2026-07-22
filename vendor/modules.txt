@@ -10,7 +10,7 @@ github.com/eljamo/libpass/v8/config/option
 github.com/eljamo/libpass/v8/internal/merger
 github.com/eljamo/libpass/v8/internal/validator
 github.com/eljamo/libpass/v8/service
-# github.com/eljamo/zxcvbn v1.0.0
+# github.com/eljamo/zxcvbn v1.1.0
 ## explicit; go 1.22
 github.com/eljamo/zxcvbn
 github.com/eljamo/zxcvbn/adjacency
