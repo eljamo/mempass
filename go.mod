@@ -6,7 +6,7 @@ require (
 	github.com/eljamo/libpass/v8 v8.0.2
 	github.com/eljamo/zxcvbn v1.1.0
 	github.com/spf13/cobra v1.10.2
-	github.com/spf13/pflag v1.0.10
+	github.com/spf13/pflag v1.1.0
 )
 
 require (
